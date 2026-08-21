@@ -7,22 +7,24 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario {
+public class Veiculo {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    public String nome;
+    public String placa;
 
-    public String cpf;
+    public String modelo;
 
-    public String senha;
+    public String ano;
 
-    public String email;
+    public String cor;
 
+    public Double quilometragem;
 }

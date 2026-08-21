@@ -7,11 +7,12 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario {
+public class Peca {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,10 +20,12 @@ public class Usuario {
 
     public String nome;
 
-    public String cpf;
+    public String preco;
 
-    public String senha;
+    public String marca;
 
-    public String email;
+    public String quantidade;
+
+    public String descricao;
 
 }

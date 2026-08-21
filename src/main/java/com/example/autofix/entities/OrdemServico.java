@@ -7,22 +7,26 @@ import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class Usuario {
+public class OrdemServico {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public Long id;
 
-    public String nome;
+    public LocalDateTime dataAbertura;
 
-    public String cpf;
+    public LocalDateTime dataConclusao;
 
-    public String senha;
+    public EnumStatusOrdemServico status=EnumStatusOrdemServico.ABERTO;
 
-    public String email;
+    public String descricao;
+
 
 }
