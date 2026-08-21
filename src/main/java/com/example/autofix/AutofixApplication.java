@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class AutofixApplication {
 
     public static void main(String[] args) {
-        System.out.println("HelloWord");
         SpringApplication.run(AutofixApplication.class, args);
     }
 
