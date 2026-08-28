@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RestController;
 import java.net.HttpURLConnection;
 
 @RestController
-@RequestMapping("/auth")
 public class AuthController {
     @Autowired
     private TokenService tokenService;
@@ -26,7 +25,7 @@ public class AuthController {
         if (loginRequest.email().equals("string")&& loginRequest.senha().equals("string")){
             //Gerar Token
             var token= tokenService.gerarToken(loginRequest.email());
-            return ResponseEntity.ok("");
+            return ResponseEntity.ok(token);
         }
         return ResponseEntity.status(HttpURLConnection.HTTP_UNAUTHORIZED).build();
     }
