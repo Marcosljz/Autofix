@@ -25,4 +25,6 @@ public class Usuario {
 
     public String email;
 
+    private EnumStatusUsuario status = EnumStatusUsuario.ATIVO;
+
 }
