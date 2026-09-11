@@ -24,9 +24,11 @@ public class OrdemServico {
 
     public LocalDateTime dataConclusao;
 
-    public EnumStatusOrdemServico status=EnumStatusOrdemServico.ABERTO;
+    public EnumStatusOrdemServico statusOrdemServico =EnumStatusOrdemServico.ABERTO;
 
     public String descricao;
+
+
 
 
 }

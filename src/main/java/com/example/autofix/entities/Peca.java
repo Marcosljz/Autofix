@@ -28,4 +28,6 @@ public class Peca {
 
     public String descricao;
 
+    public EnumStatusPeca statuspeca = EnumStatusPeca.DISPONIVEL;
+
 }
