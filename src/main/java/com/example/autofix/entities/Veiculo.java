@@ -27,4 +27,6 @@ public class Veiculo {
     public String cor;
 
     public Double quilometragem;
+
+    public EnumStatusVeiculo statusVeiculo = EnumStatusVeiculo.ATIVO;
 }
