@@ -15,75 +15,38 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.net.HttpURLConnection;
 import java.util.UUID;
-
+// Marca a classe como controller REST: recebe requisições HTTP e devolve os dados direto como JSON (sem renderizar página HTML)
 @RestController
 public class AuthController {
+
+    // Injeção de dependência: o Spring cria e entrega essa instância pronta, sem precisar dar "new TokenService()" na mão
     @Autowired
     private TokenService tokenService;
 
+    // Mesma ideia: o Spring injeta a instância do repositório de Usuario automaticamente
     @Autowired
     private UsuarioRepository usuarioRepository;
+
+    // Rota pública POST /login — é onde o usuário manda email+senha pra entrar no sistema.
     @PostMapping("/login")
 
     @Tag(description = "Controller de autenticação", name = "Autenticação")
     @Operation(description = "Metodo de login", summary = "Autenticação de usuários")
 
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
 
+        // Verifica no banco se existe um usuário com esse email E essa senha exatos.
         if (usuarioRepository.existsUsuarioByEmailAndSenha(loginRequest.email(), loginRequest.senha())) {
 
+            // Credenciais corretas -> gera um token JWT identificando esse usuário pelo email.
             var token = tokenService.gerarToken(loginRequest.email());
 
+            // Devolve o token pro front-end (ele vai usar isso no header "Authorization: Bearer <token>"
+            // em todas as próximas requisições, pra provar que está autenticado — é o que o JwtFilter confere).
             return ResponseEntity.ok(new LoginResponse(token));
         }
 
+        // Email/senha não bateram -> devolve 400 (Bad Request) com uma mensagem de erro.
         return ResponseEntity.badRequest().body("Usuário ou senha Invalido!");
-
     }
-
-    @Operation(description = "Método responsável por gerar um token de recuperação de senha para o e-mail informado",
-            summary = "Esqueci minha senha")
-    @PostMapping("/esqueci-senha")
-    public ResponseEntity<?> esqueciSenha(@RequestBody EsqueciSenhaRequest esqueciSenhaRequest){
-
-        Usuario usuarioBanco = usuarioRepository.findByEmail(esqueciSenhaRequest.email()).orElse(null);
-
-        if (usuarioBanco == null) {
-            return ResponseEntity.badRequest().body("E-mail não encontrado!");
-        }
-
-        String token = UUID.randomUUID().toString();
-
-        usuarioBanco.setTokenRecuperacaoSenha(token);
-        usuarioRepository.save(usuarioBanco);
-
-        // Enquanto não há serviço de e-mail configurado, o token é devolvido na resposta.
-        // Quando o envio de e-mail for implementado, troque a linha abaixo por um EmailService.enviar(...)
-        // e retorne apenas uma confirmação, sem expor o token.
-        return ResponseEntity.ok(new EsqueciSenhaResponse(token));
-    }
-
-    @Operation(description = "Método responsável por validar o token de recuperação e definir uma nova senha",
-            summary = "Redefinir senha")
-    @PostMapping("/redefinir-senha")
-    public ResponseEntity<?> redefinirSenha(@RequestBody RedefinirSenhaRequest redefinirSenhaRequest){
-
-        Usuario usuarioBanco = usuarioRepository.findByEmail(redefinirSenhaRequest.email()).orElse(null);
-
-        if (usuarioBanco == null) {
-            return ResponseEntity.badRequest().body("E-mail não encontrado!");
-        }
-
-        if (usuarioBanco.getTokenRecuperacaoSenha() == null
-                || !usuarioBanco.getTokenRecuperacaoSenha().equals(redefinirSenhaRequest.token())) {
-            return ResponseEntity.badRequest().body("Token inválido!");
-        }
-
-        usuarioBanco.setSenha(redefinirSenhaRequest.novaSenha());
-        usuarioBanco.setTokenRecuperacaoSenha(null);
-        usuarioRepository.save(usuarioBanco);
-
-        return ResponseEntity.ok().build();
-    }
-
 }
