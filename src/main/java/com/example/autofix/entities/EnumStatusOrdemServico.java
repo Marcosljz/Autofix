@@ -5,5 +5,5 @@ public enum EnumStatusOrdemServico {
     ABERTO,
     FECHADO,
     ANDAMENTO,
-    CANCELADO
+    EXCLUIDO
 }

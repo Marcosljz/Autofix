@@ -29,6 +29,17 @@ public class OrdemServicoController {
 
         return ResponseEntity.ok(ordemServicoRepository.findAll());
     }
+    @GetMapping("/{id}")
+    @Operation(summary = "Método de consulta uma Ordem de Serviço por ID",
+            description = "Método responsável por buscar uma Ordem de Serviço específico através do seu ID.")
+    public ResponseEntity<OrdemServico> buscarPorId(@PathVariable Long id){
+
+        OrdemServico ordemServicoBanco = ordemServicoRepository.findById(id).orElse(null);
+        if(ordemServicoBanco!= null ) {
+            return ResponseEntity.ok(ordemServicoBanco);
+        }
+        return  ResponseEntity.notFound().build();
+    }
 
     @PostMapping
     @Operation(
@@ -89,7 +100,7 @@ public class OrdemServicoController {
 
         OrdemServico ordemServicoBanco = ordemServicoRepository.findById(id).orElse(null);
         if(ordemServicoBanco!= null ){
-            ordemServicoBanco.setStatusOrdemServico(EnumStatusOrdemServico.CANCELADO);
+            ordemServicoBanco.setStatusOrdemServico(EnumStatusOrdemServico. EXCLUIDO);
             ordemServicoRepository.save(ordemServicoBanco);
             return  ResponseEntity.ok().build();
         }

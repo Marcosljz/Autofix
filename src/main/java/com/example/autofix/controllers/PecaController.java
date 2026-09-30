@@ -1,10 +1,12 @@
 package com.example.autofix.controllers;
 
 import com.example.autofix.DTOs.AtualizarStatusPecaRequest;
+import com.example.autofix.entities.EnumStatusPeca;
+
 import com.example.autofix.entities.Peca;
-import com.example.autofix.entities.Usuario;
+
 import com.example.autofix.repository.PecaRepository;
-import com.example.autofix.repository.UsuarioRepository;
+
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +30,20 @@ public class PecaController {
     public ResponseEntity<?> listarTodos() {
 
         return ResponseEntity.ok(pecaRepository.findAll());
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Método de consulta de peça por ID",
+            description = "Método responsável por buscar uma peça específica através do seu ID.")
+    public ResponseEntity<Peca> buscarPorId(@PathVariable Long id){
+
+        Peca pecabanco = pecaRepository.findById(id).orElse(null);
+        if(pecabanco!= null ) {
+
+            return ResponseEntity.ok(pecabanco);
+        }
+
+        return  ResponseEntity.notFound().build();
     }
 
     @PostMapping
@@ -85,16 +101,16 @@ public class PecaController {
     @DeleteMapping("/{id}/excluir")
     @Operation(
             summary = "Método de exclusão de peça",
-            description = "Método responsável por excluir uma peça cadastrada no sistema")
+            description = "Método responsável por alterar o status da peça para EXCLUIDO")
     public ResponseEntity<Void> excluir(@PathVariable Long id){
 
         Peca pecaBanco = pecaRepository.findById(id).orElse(null);
-        if(pecaBanco!= null ){
-            pecaRepository.delete(pecaBanco);
-            return  ResponseEntity.ok().build();
+        if(pecaBanco != null ){
+            pecaBanco.setStatuspeca(EnumStatusPeca.EXCLUIDO);
+            pecaRepository.save(pecaBanco);
+            return ResponseEntity.ok().build();
         }
 
-        return  ResponseEntity.notFound().build();
+        return ResponseEntity.notFound().build();
     }
-
 }

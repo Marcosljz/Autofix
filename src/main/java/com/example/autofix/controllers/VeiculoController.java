@@ -30,6 +30,18 @@ public class VeiculoController {
 
         return ResponseEntity.ok(veiculoRepository.findAll());
     }
+    @GetMapping("/{id}")
+    @Operation(summary = "Método de consulta de veículos por ID",
+            description = "Método responsável por buscar um veículos específico através do seu ID.")
+    public ResponseEntity<Veiculo> buscarPorId(@PathVariable Long id){
+
+        Veiculo veiculoBanco = veiculoRepository.findById(id).orElse(null);
+        if(veiculoBanco!= null ){
+            return  ResponseEntity.ok(veiculoBanco);
+        }
+
+        return  ResponseEntity.notFound().build();
+    }
 
     @PostMapping
     @Operation(
