@@ -8,59 +8,43 @@ import { useRouter } from "next/navigation";
 
 // Tipo que representa a resposta esperada do login
 import { LoginResponse } from "../types/auth";
+import Cookies from "js-cookie";
+import { login } from "../redux/slices/authSlice";
+import { buscarUsuarioLogado } from "../services/usuarioService";
+import { useDispatch } from "react-redux";
+import { loginBack } from "../services/authService";
 
 
 // Componente responsável pela tela de login
 export default function Login(){
-
-    // Permite fazer navegação entre as páginas pelo código
     const router = useRouter();
+ const dispatch =useDispatch();
 
 
-    // Função executada quando o formulário de login é enviado
-    const handlelogin = async(formData:FormData)=> {
-
-        try{
-
-            // Permite pausar a execução aqui durante a depuração no navegador
-            debugger
-
-            // Pega o valor do campo de e-mail enviado pelo formulário
+    const handleLogin = async(formData:FormData) =>{
+        try {
+            debugger;
             const emailTela = formData.get("email")?.toString() ?? "";
-
-            // Pega o valor do campo de senha enviado pelo formulário
             const senhaTela = formData.get("senha")?.toString() ?? "";
 
+            var loginResposta = await loginBack(emailTela,senhaTela);
 
-            // Envia e-mail e senha para o endpoint de login do backend
-            var loginResposta = await axios.post<LoginResponse>(
-                "http://localhost:8080/login",
+           
+                Cookies.set('token',loginResposta.token,{secure: true, expires: 7});
+          
+                var usuarioLogado = await buscarUsuarioLogado();
+
+               dispatch(login(
                 {
-                    email: emailTela,
-                    senha: senhaTela
+                    token:loginResposta.token,
+                    Usuario:{...usuarioLogado}
                 }
-            );
-
-
-            // Se o backend retornar status 200, o login foi realizado
-            if(loginResposta.status==200){
-
-                // Redireciona o usuário para a página principal do sistema
+                ));
                 router.push("/home")
-
-            }else{
-
-                // Caso o backend retorne outro status
-                alert("Login ou senha Invalido!")
-            }
-
-        }catch(error){
-
-            // Caso aconteça algum erro na requisição ou no login
+           
+        } catch (error) {
             alert("Login ou senha Invalido!")
-
         }
-
     }
 
 
@@ -84,7 +68,7 @@ export default function Login(){
 
 
             {/* Formulário responsável por receber as credenciais */}
-            <form action={handlelogin} className="flex flex-col gap-5">
+            <form action={handleLogin} className="flex flex-col gap-5">
 
 
                 <div className="flex flex-col gap-2">
@@ -134,4 +118,8 @@ export default function Login(){
     </div>
 
    );
+}
+
+function userDispact() {
+    throw new Error("Function not implemented.");
 }

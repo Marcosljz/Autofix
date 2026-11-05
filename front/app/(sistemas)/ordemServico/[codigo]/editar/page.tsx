@@ -8,6 +8,8 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import OrdemServicoForm from "../../components/OrdemServicoForm";
 import { OrdemServico } from "@/app/types/ordemservico";
+import { consultaVeiculoPorId } from "@/app/services/veiculoService";
+import { consultaOrdemServicoPorId } from "@/app/services/ordemServicoService";
 
 
 export default function EditarOrdemServico() {
@@ -31,15 +33,10 @@ export default function EditarOrdemServico() {
 
     const buscarDados = async () => {
 
-        const valorOrdemServicoBack = await axios.get<OrdemServico>(
-            'http://localhost:8080/ordemservicos/' + codigo
-        );
-
-        if (valorOrdemServicoBack.status == 200) {
-
-            setOrdemServicoDados(valorOrdemServicoBack.data);
-
-        } else {
+       const valorOrdemServicoBack = await consultaOrdemServicoPorId(codigo);
+           if(valorOrdemServicoBack){
+                  setOrdemServicoDados(valorOrdemServicoBack);
+              }else{
 
             router.push("/ordemServico");
 

@@ -1,5 +1,6 @@
 'use client'
 
+import { atualizarPeca, salvarPeca } from "@/app/services/pecaService";
 import { Peca } from "@/app/types/peca";
 import axios from "axios";
 import Link from "next/link";
@@ -38,36 +39,29 @@ export default function PecaForm({ pecaExistente }: PecaFormProps) {
 
    const handlerSalvar = async () => {
 
-        if (pecaExistente) {
+     if(pecaExistente){
+             var dadosRetorno = await atualizarPeca(peca);
+             if(dadosRetorno){
+                 alert("Peça foi salvo com sucesso!");
+             }else{
+                 alert("Erro ao atualizar a Peça!");
+     
+                 return;
+             }
+     
+     
+                 }else{
+             var dadosRetorno = await salvarPeca(peca);
+             if(dadosRetorno){
+                 alert("A Peça foi salva com sucesso!");
+             }else{
+                 alert("Erro ao salvar a Peça!");
+     
+                 return;
+             }
+         
+         }
 
-            // MANTÉM A ROTA DO SEU BACKEND
-            var dadosRetorno = await axios.put(
-                'http://localhost:8080/pecas/' + peca.id,
-                peca
-            );
-
-            if (dadosRetorno.status === 200) {
-                alert("Peça foi salva com sucesso!");
-            } else {
-                alert(dadosRetorno.data);
-                return;
-            }
-
-        } else {
-
-            // MANTÉM A ROTA DO SEU BACKEND
-            var dadosRetorno = await axios.post(
-                'http://localhost:8080/pecas',
-                peca
-            );
-
-            if (dadosRetorno.status === 200) {
-                alert("Peça foi salva com sucesso!");
-            } else {
-                alert(dadosRetorno.data);
-                return;
-            }
-        }
 
         // ROTA DO FRONTEND
         router.push("/peca");

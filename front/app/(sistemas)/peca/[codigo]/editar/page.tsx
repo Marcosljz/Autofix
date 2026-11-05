@@ -6,6 +6,8 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Peca } from "@/app/types/peca";
 import axios from "axios";
+import { consultaUsuarioPorId } from "@/app/services/usuarioService";
+import { consultaPecaPorId } from "@/app/services/pecaService";
 
 export default function EditarPeca() {
 
@@ -23,14 +25,11 @@ export default function EditarPeca() {
 
     const buscarDados = async () => {
 
-        const valorPecaBack = await axios.get<Peca>(
-            'http://localhost:8080/pecas/' + codigo
-        );
-
-        if (valorPecaBack.status === 200) {
-            setPeca(valorPecaBack.data);
-        } else {
-            router.push("/peca");
+         const valorPecaBack = await consultaPecaPorId(codigo);
+        if(valorPecaBack){
+            setPeca(valorPecaBack);
+        }else{
+            router.push("/peca")
         }
     }
 

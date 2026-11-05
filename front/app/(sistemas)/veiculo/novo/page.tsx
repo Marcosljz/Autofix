@@ -14,7 +14,7 @@ export default function NovoVeiculo() {
                 <div className="mb-6">
 
                     <Link
-                        href="/veiculos"
+                        href="/veiculo"
                         className="inline-flex items-center gap-1.5 text-xs font-semibold text-neutral-500 hover:text-orange-500 transition-colors"
                     >
 

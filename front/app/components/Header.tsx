@@ -1,13 +1,17 @@
-"use client"
+'use client'
 
 // Hook do Next.js usado para navegar entre páginas pelo código
 import { useRouter } from "next/navigation";
+import { store } from "../redux/store";
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/slices/authSlice";
 
 
 // Componente responsável pelo cabeçalho do sistema
 export default function Header() {
 
-    // Cria o router para poder mudar de página através do código
+    const usuario = store.getState().auth.usuario;
+    const dispatch = useDispatch();
     const router = useRouter();
 
 
@@ -60,7 +64,7 @@ export default function Header() {
                     </div>
 
                     <span className="text-sm font-semibold text-white">
-                        Usuário Marcos Leão
+                       {usuario?.nome.toLocaleUpperCase()|| 'Usuário não identificado'}
                     </span>
 
                 </div>
@@ -68,7 +72,10 @@ export default function Header() {
 
                 {/* Botão que chama a função de sair */}
                 <button
-                    onClick={handleSair}
+                    onClick={()=>{
+                    dispatch(logout());
+                 }
+                }
                     className="px-4 py-2 text-sm font-bold text-orange-500 border border-orange-500/30 rounded-lg hover:bg-orange-500 hover:text-black transition-colors active:scale-95"
                 >
                     Sair

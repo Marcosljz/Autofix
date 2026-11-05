@@ -1,22 +1,22 @@
 "use client"
 
+import { atualizarStatusUsuario, buscarListaUsuarios, deletarUsuario } from "@/app/services/usuarioService";
 // Modelo/tipo usado para representar um usuário
 import { Usuario } from "@/app/types/usuario";
 
-// Axios é usado para fazer as requisições para o backend
+
 import axios from "axios";
 
-// Link permite navegar entre páginas do Next.js
+
 import Link from "next/link";
 
-// Hooks usados para controlar estado e executar código quando a página carrega
+
 import { useEffect, useState } from "react";
 
 
-// Página responsável por listar os usuários cadastrados
 export default function Usuarios() {
 
-    // Guarda a lista de usuários que será exibida na tabela
+   
     const [usuarios, setUsuarios] = useState<Usuario[]>([]);
 
     // Executa uma vez quando a página é carregada
@@ -29,44 +29,35 @@ export default function Usuarios() {
     const carregarDados = async () => {
 
         try {
+           
+            const dados = await buscarListaUsuarios();
 
-            // Faz uma requisição GET para buscar todos os usuários
-            const dados = await axios.get<Usuario[]>("http://localhost:8080/usuarios");
-
-
-            // Coloca os usuários recebidos do backend no estado
-            setUsuarios(dados.data);
+      
+            setUsuarios(dados);
 
         } catch (error) {
 
-            // Mostra uma mensagem caso não consiga acessar o servidor
+      
             alert("Erro ao carregar dados do servidor!")
         }
     }
 
 
-    // Função responsável por excluir um usuário
+  
     const handleDeletarUsuario = async (usuario: Usuario) => {
 
-        // Envia uma requisição DELETE para o backend
-        const dadosRetorno = await axios.delete(
-            'http://localhost:8080/usuarios/' + usuario.id + '/excluir'
-        )
+        const dadosRetorno = await deletarUsuario(usuario.id|| 0 );
 
-
-        // Verifica se a requisição foi concluída com sucesso
-        if (dadosRetorno.status = 200) {
+        if (dadosRetorno == 200) {
 
             alert("excluido com sucesso");
 
         } else {
-
-            alert(dadosRetorno.data);
+            alert("erro ao excluir usuario")
 
             return;
         }
 
-        // Atualiza a tabela depois da exclusão
         carregarDados();
     }
 
@@ -75,43 +66,10 @@ export default function Usuarios() {
     const handleAlterarStatusUsuario = async (usuario: Usuario) => {
 
 
-        // Objeto que será enviado para o backend
-        let novoStatus = {};
+         await atualizarStatusUsuario(usuario);
 
-        // Se estiver ativo, muda para bloqueado
-        if (usuario.status === "ATIVO") {
-            novoStatus = { status: "BLOQUEADO" }
-
-        } else {
-
-            // Caso contrário, volta para ativo
-            novoStatus = { status: "ATIVO" }
-        }
-
-
-        // Envia o novo status para o backend através de PATCH
-        const dadosRetorno = await
-            axios.patch(
-                'http://localhost:8080/usuarios/' + usuario.id + '/status',
-                novoStatus
-            );
-
-
-        // Verifica se a alteração foi realizada
-        if (dadosRetorno.status == 200) {
-
-            alert("Atulizado status com sucesso!");
-
-        } else {
-
-            alert(dadosRetorno.data);
-
-            return;
-        }
-
-
-        // Atualiza a lista para mostrar o novo status
         carregarDados();
+
 
     }
 

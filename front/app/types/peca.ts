@@ -9,3 +9,7 @@ export class Peca{
         public statuspeca:string
     ){}
 }
+
+export interface PecaFormProps {
+    pecaExistente?: Peca
+}

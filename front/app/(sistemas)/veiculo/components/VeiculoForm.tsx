@@ -1,4 +1,5 @@
 'use client'
+import { atualizarVeiculo, salvarVeiculo } from "@/app/services/veiculoService";
 import { veiculo } from "@/app/types/veiculo";
 import axios from "axios";
 import Link from "next/link";
@@ -67,41 +68,28 @@ export default function VeiculoForm({ veiculoExistente }: VeiculoFormProps) {
 
         if (veiculoExistente) {
 
-            var dadosRetorno = await axios.put<number>(
-                'http://localhost:8080/veiculos/' + veiculoDados.id,
-                veiculoDados
-            );
-
-            if (dadosRetorno.status === 200) {
-
-                alert("Veículo foi salvo com sucesso!");
-
-            } else {
-
-                alert(dadosRetorno.data);
-                return;
-
-            }
-
-        } else {
-
-            var dadosRetorno = await axios.post<number>(
-                'http://localhost:8080/veiculos',
-                veiculoDados
-            );
-
-            if (dadosRetorno.status === 200 || dadosRetorno.status === 201) {
-
-                alert("Veículo foi cadastrado com sucesso!");
-
-            } else {
-
-                alert(dadosRetorno.data);
-                return;
-
-            }
-        }
-
+           if(veiculoExistente){
+                  var dadosRetorno = await atualizarVeiculo(veiculoDados);
+                  if(dadosRetorno){
+                      alert("Usuário foi salvo com sucesso!");
+                  }else{
+                      alert("Erro ao atualizar Usuário!");
+          
+                      return;
+                  }
+          
+          
+                      }else{
+                  var dadosRetorno = await salvarVeiculo(veiculoDados);
+                  if(dadosRetorno){
+                      alert("Usuário foi salvo com sucesso!");
+                  }else{
+                      alert("Erro ao salvar Usuário!");
+          
+                      return;
+                    }
+                  }
+                }
         router.push("/veiculo");
     }
 

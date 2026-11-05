@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import { veiculo } from "@/app/types/veiculo";
 import axios from "axios";
 import VeiculoForm from "../../components/VeiculoForm";
+import { consultaVeiculoPorId } from "@/app/services/veiculoService";
 
 
 export default function EditarVeiculo() {
@@ -27,24 +28,16 @@ export default function EditarVeiculo() {
     }, []);
 
 
-    const buscarDados = async () => {
+  const buscarDados = async () => {
 
-        const valorVeiculoBack = await axios.get<veiculo>(
-            'http://localhost:8080/veiculos/' + codigo
-        );
-
-        if (valorVeiculoBack.status == 200) {
-
-            setVeiculoDados(valorVeiculoBack.data);
-
-        } else {
-
-            router.push("/veiculo");
-
-        }
-
+      
+     const valorVeiculoBack = await consultaVeiculoPorId(codigo);
+           if(valorVeiculoBack){
+                  setVeiculoDados(valorVeiculoBack);
+              }else{
+                  router.push("/veiculo")
+              }
     }
-
 
     if (!veiculoDados) {
         return (

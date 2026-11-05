@@ -1,4 +1,5 @@
 'use client'
+import { atualizarUsuario, salvarUsuario } from "@/app/services/usuarioService";
 import { Usuario, UsuarioFormProps } from "@/app/types/usuario";
 import axios from "axios";
 import Link from "next/link";
@@ -7,17 +8,15 @@ import { useState } from "react";
 
 
 export default function UsuarioForm({ usuarioExistente }: UsuarioFormProps) {
-    /*() estado inicial*/
+   
     const router = useRouter();
-    // Se recebeu um usuarioExistente (modo edição), começa com ele já preenchido.
-    // Se não recebeu (modo criação), começa com um Usuario "vazio" com status ATIVO.
+
     const [usuario, setUsuario] = useState<Usuario>(
         usuarioExistente || new Usuario(null, "", "", "ATIVO", "", "")
     );
 
 
-    // Função genérica de troca de campo: recebe qual campo mudou e o novo valor,
-    // e recria o objeto Usuario mantendo os campos que não mudaram (imutabilidade do estado do React).
+
     const handlerChange = (campo: 'nome' | 'email' | 'cpf' | 'senha', valor: string) => {
 
         setUsuario(valorAnterior =>
@@ -33,36 +32,33 @@ export default function UsuarioForm({ usuarioExistente }: UsuarioFormProps) {
         )
     }
 
-    // Chamada quando o formulário é enviado. Decide entre PUT (editar) ou POST (criar)
-    // dependendo se já existia um usuarioExistente.
+    
     const handlerSalvar = async (formData: FormData) => {
 
-        if (usuarioExistente) {
-            var dadosRetorno = await axios.put<number>('http://localhost:8080/usuarios/' + usuario.id, usuario)
+         if(usuarioExistente){
+        var dadosRetorno = await atualizarUsuario(usuario);
+        if(dadosRetorno){
+            alert("Usuário foi salvo com sucesso!");
+        }else{
+            alert("Erro ao atualizar Usuário!");
 
-
-            if (dadosRetorno.status = 200) {
-                alert("Usuário foi salvo com sucesso!");
-            } else {
-                alert(dadosRetorno.data);
-
-                return;
-            }
-
-
-        } else {
-            var dadosRetorno = await axios.post<number>('http://localhost:8080/usuarios', usuario)
-
-            if (dadosRetorno.status = 200) {
-                alert("Usuário foi salvo com sucesso!");
-            } else {
-                alert(dadosRetorno.data);
-
-                return;
-            }
+            return;
         }
-        router.push("/usuarios"); // depois de salvar, volta pra listagem
 
+
+            }else{
+        var dadosRetorno = await salvarUsuario(usuario);
+        if(dadosRetorno){
+            alert("Usuário foi salvo com sucesso!");
+        }else{
+            alert("Erro ao salvar Usuário!");
+
+            return;
+        }
+    
+    }
+
+    router.push("/usuarios");
     }
 
     return (

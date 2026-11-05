@@ -1,5 +1,7 @@
 'use client'
 
+import { atualizarOrdemServico, salvarOrdemServico } from "@/app/services/ordemServicoService";
+import { atualizarUsuario, salvarUsuario } from "@/app/services/usuarioService";
 import { OrdemServico } from "@/app/types/ordemservico";
 import axios from "axios";
 import Link from "next/link";
@@ -55,45 +57,28 @@ export default function OrdemServicoForm({
 
     const handlerSalvar = async () => {
 
-        if (ordemServicoExistente) {
+        if(ordemServicoExistente){
+        var dadosRetorno = await atualizarOrdemServico(ordemServico);
+        if(dadosRetorno){
+            alert("A Ordem De Serviço foi salvo com sucesso!");
+        }else{
+            alert("Erro ao atualizar A Ordem De Serviço!");
 
-            const dadosRetorno = await axios.put(
-                'http://localhost:8080/ordemservicos/' + ordemServico.id,
-                ordemServico
-            );
-
-            if (dadosRetorno.status === 200) {
-
-                alert("Ordem de serviço foi salva com sucesso!");
-
-            } else {
-
-                alert(dadosRetorno.data);
-                return;
-
-            }
-
-        } else {
-
-            const dadosRetorno = await axios.post(
-                'http://localhost:8080/ordemservicos',
-                ordemServico
-            );
-
-            if (
-                dadosRetorno.status === 200 ||
-                dadosRetorno.status === 201
-            ) {
-
-                alert("Ordem de serviço foi cadastrada com sucesso!");
-
-            } else {
-
-                alert(dadosRetorno.data);
-                return;
-
-            }
+            return;
         }
+
+
+            }else{
+        var dadosRetorno = await salvarOrdemServico(ordemServico);
+        if(dadosRetorno){
+            alert("A Ordem De Serviço foi salvo com sucesso!");
+        }else{
+            alert("Erro ao salvar A Ordem De Serviço!");
+
+            return;
+        }
+    
+    }
 
         router.push("/ordemServico");
     }
@@ -158,7 +143,7 @@ export default function OrdemServicoForm({
                         onChange={(e) =>
                             handlerChange(
                                 'dataConclusao',
-                                e.target.value
+                                e.target.value 
                             )
                         }
                         className="w-full bg-neutral-800 border border-neutral-700 text-white rounded-lg px-4 py-2.5 outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500 transition-colors"

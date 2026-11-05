@@ -1,5 +1,6 @@
 "use client"
 
+import { atualizarStatusPecas, buscarListaPeca, deletarPeca } from "@/app/services/pecaService";
 import { Peca } from "@/app/types/peca";
 import axios from "axios";
 import Link from "next/link";
@@ -15,56 +16,38 @@ export default function Pecas() {
 
     const carregarDados = async () => {
 
-        try {
-
-            const dados = await axios.get<Peca[]>(
-                "http://localhost:8080/pecas"
-            );
-
-            setPecas(dados.data);
-
-        } catch (error) {
-            alert("Erro ao carregar dados do servidor!")
-        }
-    }
+     try {
+        const dados = await  buscarListaPeca();
+                    
+         setPecas(dados);
+        
+          } catch (error) {
+        
+            alert("Erro ao carregar dados do servidor!");
+        
+          }
+     }
 
     const handleDeletarPeca = async (peca: Peca) => {
 
-        var dadosRetorno = await axios.delete(
-            'http://localhost:8080/pecas/' + peca.id + '/excluir'
-        );
-
-        if (dadosRetorno.status === 200) {
-            alert("Excluído com sucesso");
-        } else {
-            alert(dadosRetorno.data);
-            return;
-        }
+          const dadosRetorno = await deletarPeca(peca.id|| 0 );
+       
+            if (dadosRetorno == 200) {
+       
+                 alert("excluido com sucesso");
+       
+             } else {
+                   alert("erro ao excluir a peça")
+       
+                   return;
+               }
 
         carregarDados();
     }
 
     const handleAlterarStatusPeca = async (peca: Peca) => {
 
-        var novoStatus = {};
-
-        if (peca.statuspeca === "DISPONIVEL") {
-            novoStatus = { statusPeca: "ESGOTADO" }
-        } else {
-            novoStatus = { statusPeca: "DISPONIVEL" }
-        }
-
-        var dadosRetorno = await axios.patch(
-            'http://localhost:8080/pecas/' + peca.id + '/status',
-            novoStatus
-        );
-
-        if (dadosRetorno.status === 200) {
-            alert("Atualizado status com sucesso!");
-        } else {
-            alert(dadosRetorno.data);
-            return;
-        }
+              await atualizarStatusPecas(peca);
 
         carregarDados();
     }
