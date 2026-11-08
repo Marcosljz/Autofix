@@ -1,6 +1,6 @@
 package com.example.autofix.domain.repository;
 
-import com.example.autofix.domain.entities.EnumStatusVeiculo;
+import com.example.autofix.application.DTOs.EnumStatusVeiculo;
 import com.example.autofix.domain.entities.Veiculo;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -17,7 +17,8 @@ public interface VeiculoRepository extends JpaRepository<Veiculo,Long> {
 
     Optional<List<Veiculo>> findByStatusVeiculoNot(EnumStatusVeiculo statusVeiculo);
 
-    List<Veiculo> findAllByMecanica_Id(Long mecanicaId);
+    List<Veiculo> findByMecanica_Id(Long mecanicaId);
 
-    Optional<Veiculo> findByIdAndMecanica_Id(Long id, Long mecanicaId);
+    List<Veiculo> findByUsuarioCadastro_Id(Long usuarioId);
+
 }

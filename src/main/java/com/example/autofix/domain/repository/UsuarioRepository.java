@@ -1,6 +1,6 @@
 package com.example.autofix.domain.repository;
 
-import com.example.autofix.domain.entities.EnumStatusUsuario;
+import com.example.autofix.application.DTOs.EnumStatusUsuario;
 import com.example.autofix.domain.entities.Usuario;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
@@ -26,5 +26,5 @@ public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
     // Usado pra listar usuários ativos, por exemplo, excluindo os que estão EXCLUIDO.
     Optional<List<Usuario>> findByStatusNot(EnumStatusUsuario status);
 
-    List<Usuario> getUsuariosByEmpresa_Id(long empresa);
+    List<Usuario> getUsuariosBymecanica_id(long mecanica);
 }
