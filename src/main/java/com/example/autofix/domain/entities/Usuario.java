@@ -1,6 +1,8 @@
 package com.example.autofix.domain.entities;
 
+import com.example.autofix.application.DTOs.CriarAdminMecanicaRequest;
 import com.example.autofix.application.DTOs.CriarAdminRequest;
+import com.example.autofix.application.DTOs.EnumStatusUsuario;
 import com.example.autofix.application.DTOs.UsuarioRequest;
 import com.example.autofix.domain.valueobject.CPF;
 import jakarta.persistence.*;
@@ -68,6 +70,14 @@ public class Usuario implements UserDetails {
         this.setSenha(usuario.senha());
         this.setEmail(usuario.email());
         this.setRole("ROLE_USER");
+    }
+
+    public Usuario(CriarAdminMecanicaRequest request) {
+        this.setCpf(new CPF(request.cpf()));
+        this.setNome(request.nome());
+        this.setSenha(request.senha());
+        this.setEmail(request.email());
+        this.setRole("ROLE_MECANICA");
     }
 
     @Override
