@@ -12,8 +12,11 @@ public record UsuarioLogado(Long id, String email, CPF cpf,
                 usuario.getId(),
                 usuario.getEmail(),
                 usuario.getCpf(),
-                1L,
+                usuario.getMecanica()==null ?
+                        null
+                        :usuario.getMecanica().getId(),
                 usuario.getAuthorities()
         );
     }
 }
+
