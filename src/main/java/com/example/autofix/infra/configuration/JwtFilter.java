@@ -32,20 +32,22 @@ public class JwtFilter extends OncePerRequestFilter {
 
 
         String uri = request.getRequestURI();
+        String metodo = request.getMethod();
 
-        // Lista de rotas "públicas" que NÃO exigem token (login, Swagger, etc.).
-        // Se a URL começar com alguma dessas, deixa passar direto (filterChain.doFilter) sem checar token.
+        // Rotas públicas
         if (uri.startsWith("/swagger-ui")
                 || uri.startsWith("/v2/api-docs")
                 || uri.startsWith("/v3/api-docs")
                 || uri.startsWith("/swagger-resources")
-                || uri.startsWith("wejars")
-                || uri.startsWith("/login")
+                || uri.startsWith("/webjars")
+                || uri.equals("/login")
+                || (uri.equals("/usuarios/admin") && metodo.equals("POST"))
+                || metodo.equals("OPTIONS")) {
 
-        ) {
             filterChain.doFilter(request, response);
             return;
         }
+
 
 
         String authHeader = request.getHeader("Authorization");
@@ -69,6 +71,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(user);
 
             } catch (Exception e) {
+
 
                 response.setStatus((HttpServletResponse.SC_UNAUTHORIZED));
                 response.getWriter().println("Token inválido");
