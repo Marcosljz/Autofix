@@ -37,6 +37,7 @@ public class Usuario implements UserDetails {
 
     public String senha;
 
+    @Column(unique = true)
     public String email;
 
     private String role = "ROLE_USER";
