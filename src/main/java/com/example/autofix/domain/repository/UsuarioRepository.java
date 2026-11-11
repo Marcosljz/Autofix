@@ -27,4 +27,8 @@ public interface UsuarioRepository extends JpaRepository<Usuario,Long> {
     Optional<List<Usuario>> findByStatusNot(EnumStatusUsuario status);
 
     List<Usuario> getUsuariosBymecanica_id(long mecanica);
+
+    boolean existsByEmail(String email);
+
+    boolean existsByEmailAndIdNot(String email, Long id);
 }

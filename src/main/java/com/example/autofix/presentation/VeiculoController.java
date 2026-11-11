@@ -1,11 +1,8 @@
 package com.example.autofix.presentation;
 
-import com.example.autofix.application.DTOs.AtualizarStatusVeiculoRequest;
-import com.example.autofix.application.DTOs.VeiculoRequest;
-import com.example.autofix.application.DTOs.VeiculoResponse;
+import com.example.autofix.application.DTOs.*;
 import com.example.autofix.application.services.VeiculoService;
-import com.example.autofix.domain.entities.EnumStatusVeiculo;
-import com.example.autofix.domain.entities.Veiculo;
+import com.example.autofix.application.DTOs.EnumStatusVeiculo;
 import com.example.autofix.domain.repository.VeiculoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -34,12 +31,12 @@ public class VeiculoController {
             description = "Método responsável por consultar todos os veículos cadastrados no sistema")
     public ResponseEntity<List<VeiculoResponse>> listarTodos() {
 
-        return ResponseEntity.ok(veiculoService.ListarTodosVeiculosTable());
+        return ResponseEntity.ok(veiculoService.listarTodosVeiculosTable());
     }
     @GetMapping("/{id}")
     @Operation(summary = "Método de consulta de veículos por ID",
             description = "Método responsável por buscar um veículos específico através do seu ID.")
-    public ResponseEntity<VeiculoResponse> buscarPorId(@PathVariable Long id){
+    public ResponseEntity<VeiculoResponse> buscarPorId (@PathVariable Long id){
 
         VeiculoResponse veiculoBanco = veiculoService.buscarPorId(id);
         if(veiculoBanco!= null ){
@@ -54,11 +51,15 @@ public class VeiculoController {
             summary = "Método de criação de veículo",
             description = "Método responsável por cadastrar um novo veículo no sistema")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Veiculo> criar(@RequestBody VeiculoRequest veiculo){
+    public ResponseEntity<?> criar(@RequestBody VeiculoRequest veiculo){
 
-       try {
-           VeiculoResponse veiculoBanco = veiculoService.salvarVeiculo(veiculo,0L)
-       }catch (Exception e)
+        try {
+            VeiculoResponse veiculoBanco = veiculoService.salvarVeiculo(veiculo,0L);
+            return ResponseEntity.ok(veiculoBanco);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+
     }
 
     @PatchMapping("/{id}/status")
@@ -67,11 +68,12 @@ public class VeiculoController {
             description = "Método responsável por atualizar apenas o status de um veículo cadastrado no sistema")
     public ResponseEntity<Void> atualizarStatus(@PathVariable Long id, @RequestBody AtualizarStatusVeiculoRequest statusRequest){
 
-        var atualizarVeiculo = veiculoService.atualizarStatusVeiculo(statusRequest.statusVeiculo(),id);
+        var atualizarVeiculo = veiculoService.atualizarStatus(statusRequest.statusVeiculo(),id);
 
-        if (atualizarVeiculo) {
+        if(atualizarVeiculo){
             return ResponseEntity.ok().build();
         }
+
         return  ResponseEntity.notFound().build();
     }
 
@@ -79,23 +81,13 @@ public class VeiculoController {
     @Operation(
             summary = "Método de atualização de veículo",
             description = "Método responsável por atualizar todos os dados de um veículo cadastrado no sistema")
-    public ResponseEntity<Veiculo> atualizar(@PathVariable Long id, @RequestBody Veiculo veiculo){
+    public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody VeiculoRequest veiculo){
 
-        try{
-            Veiculo veiculoBanco = veiculoRepository.findById(id).orElse(null);
-            if(veiculoBanco!= null ){
-                veiculoBanco.setPlaca(veiculo.getPlaca());
-                veiculoBanco.setModelo(veiculo.getModelo());
-                veiculoBanco.setAno(veiculo.getAno());
-                veiculoBanco.setCor(veiculo.getCor());
-                veiculoBanco.setQuilometragem(veiculo.getQuilometragem());
-                veiculoBanco.setStatusVeiculo(veiculo.getStatusVeiculo());
-                veiculoRepository.save(veiculoBanco);
-                return  ResponseEntity.ok().build();
-            }
-            return  ResponseEntity.notFound().build();
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
+        try {
+            VeiculoResponse veiculoBanco = veiculoService.salvarVeiculo(veiculo,id);
+            return ResponseEntity.ok(veiculoBanco);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
 
     }
@@ -106,13 +98,14 @@ public class VeiculoController {
             description = "Método responsável por excluir um veículo cadastrado no sistema")
     public ResponseEntity<Void> excluir(@PathVariable Long id){
 
-       var atualizarVeiculo = veiculoService.atualizarStatusVeiculo(EnumStatusVeiculo.EXCLUIDO,id);
+        var atualizarVeiculo = veiculoService.atualizarStatus(EnumStatusVeiculo.EXCLUIDO,id);
 
-       if (atualizarVeiculo){
-           return ResponseEntity.ok().build();
+        if(atualizarVeiculo){
+            return ResponseEntity.ok().build();
         }
 
         return  ResponseEntity.notFound().build();
+
     }
 
 }

@@ -1,4 +1,4 @@
-package com.example.autofix.domain.entities;
+package com.example.autofix.application.DTOs;
 
 public enum EnumStatusUsuario {
     ATIVO,

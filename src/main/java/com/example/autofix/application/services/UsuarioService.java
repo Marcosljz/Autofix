@@ -119,14 +119,19 @@ public class UsuarioService {
     public CriarAdminResponse criarAdmin(CriarAdminRequest criarAdminRequest) {
 
         if (!criarAdminRequest.secretKey().equals(secret)) {
-            return new CriarAdminResponse(0L, "Usuario Salvo com sucesso!");
+            throw new RuntimeException("Chave de segurança inválida!");
         }
 
         Usuario usuarioAdminSalvar = new Usuario(criarAdminRequest);
 
+        validarEmailDisponivel(usuarioAdminSalvar.getEmail(), null);
+
         usuarioRepository.save(usuarioAdminSalvar);
 
-        return new CriarAdminResponse(usuarioAdminSalvar.getId(), "Usuario Salvo com sucesso!");
+        return new CriarAdminResponse(
+                usuarioAdminSalvar.getId(),
+                "Usuario Salvo com sucesso!"
+        );
     }
 
 
@@ -151,6 +156,9 @@ public class UsuarioService {
         mecanica = mecanicaRepository.save(mecanica);
 
         Usuario administrador = new Usuario(request);
+
+        validarEmailDisponivel(administrador.getEmail(), null);
+
         administrador.setMecanica(mecanica);
 
         usuarioRepository.save(administrador);
@@ -172,6 +180,21 @@ public class UsuarioService {
     }
 
 
+    private void validarEmailDisponivel(String email, Long id) {
+
+        boolean emailExiste;
+
+        if (id == null) {
+            emailExiste = usuarioRepository.existsByEmail(email);
+        } else {
+            emailExiste = usuarioRepository.existsByEmailAndIdNot(email, id);
+        }
+
+        if (emailExiste) {
+            throw new RuntimeException("Este e-mail já está cadastrado no sistema!");
+        }
+    }
+
     public UsuarioResponse salvarUsuario(UsuarioRequest usuario, Long id) {
 
         // Cadastro de funcionário: somente administrador da mecânica
@@ -192,6 +215,8 @@ public class UsuarioService {
             }
 
             Usuario novoUsuario = new Usuario(usuario);
+
+            validarEmailDisponivel(novoUsuario.getEmail(), null);
 
             novoUsuario.setMecanica(mecanica);
 
@@ -239,6 +264,9 @@ public class UsuarioService {
                     "Você não tem permissão para editar usuários!"
             );
         }
+
+        // Verifica se o e-mail pertence a outro usuário
+        validarEmailDisponivel(usuario.email(), usuarioBanco.getId());
 
         usuarioBanco.setCpf(new CPF(usuario.cpf()));
         usuarioBanco.setEmail(usuario.email());

@@ -1,6 +1,5 @@
 package com.example.autofix.application.DTOs;
 
-import com.example.autofix.domain.entities.EnumStatusVeiculo;
 import com.example.autofix.domain.entities.Veiculo;
 
 public record VeiculoResponse(Long id , String placa, String Modelo, String ano , String cor, Double quilometragem, EnumStatusVeiculo statusVeiculo) {

@@ -19,26 +19,33 @@ public class SecurityConfiguration {
     private JwtFilter jwtFilter;
 
     @Bean
-    public SecurityFilterChain filterChain (HttpSecurity http) throws Exception{
+    public SecurityFilterChain filterChain (HttpSecurity http) throws Exception {
 
         return http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                                .requestMatchers("/login",
-                                        "/swagger-ui/**",
-                                        "/webjars/**",
-                                        "/swagger-resources/**",
-                                        "/v3/api-docs/**"
-                                ).permitAll()
-                                .requestMatchers(HttpMethod.OPTIONS).permitAll()
-//                        .requestMatchers("/usuarios/**")
-//                            .hasRole("ADMIN")
-                                .anyRequest().authenticated()
+                        .requestMatchers("/login",
+                                "/swagger-ui/**",
+                                "/webjars/**",
+                                "/swagger-resources/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+
+                        // Cadastro do primeiro ADMIN sem token
+                        .requestMatchers(HttpMethod.POST, "/usuarios/admin").permitAll()
+
+                        // Somente ADMIN global pode consultar CNPJ
+                        .requestMatchers(HttpMethod.GET, "/mecanicas/cnpj/**").hasRole("ADMIN")
+
+                        // Somente ADMIN global pode cadastrar mecânicas
+                        .requestMatchers(HttpMethod.POST, "/usuarios/criar-mecanica").hasRole("ADMIN")
+
+                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
+
+                        .anyRequest().authenticated()
                 )
-                .addFilterBefore( jwtFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
 
     }
-
-
 }

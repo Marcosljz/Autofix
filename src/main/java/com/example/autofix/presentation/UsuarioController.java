@@ -2,7 +2,7 @@ package com.example.autofix.presentation;
 
 import com.example.autofix.application.DTOs.*;
 import com.example.autofix.application.services.UsuarioService;
-import com.example.autofix.domain.entities.EnumStatusUsuario;
+import com.example.autofix.application.DTOs.EnumStatusUsuario;
 
 import com.example.autofix.domain.repository.UsuarioRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -46,6 +46,20 @@ public class UsuarioController {
 
     }
 
+    @PostMapping("/criar-mecanica")
+    public ResponseEntity<?> criarMecanica (
+            @RequestBody CriarAdminMecanicaRequest request) {
+
+        try {
+            CriarAdminMecanicaResponse resposta =
+                    usuarioService.criarMecanicaComAdministrador(request);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 
     @GetMapping("/{id}")
     @Operation(summary = "Método de consulta de usuário por ID",
@@ -61,16 +75,14 @@ public class UsuarioController {
     }
 
 
-
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED) // responde com status 201 (Created) quando dá certo
     @Operation(summary = "Metodo de criação de usuários!",
             description = "Metodo para responsavel em efetuar a criação de novos usuários !")
     public ResponseEntity<?> criar(@RequestBody UsuarioRequest usuario){
 
         try {
-            UsuarioResponse usuarioBanco = usuarioService.salvarUsuario(usuario,0L);
-            return ResponseEntity.ok(usuarioBanco);
+            UsuarioResponse usuarioBanco = usuarioService.salvarUsuario(usuario, 0L);
+            return ResponseEntity.status(HttpStatus.CREATED).body(usuarioBanco);
         }catch (Exception e){
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -78,10 +90,11 @@ public class UsuarioController {
     }
 
 
+
     @PatchMapping("/{id}/status")
     public ResponseEntity<Void> atualizarStatus(@PathVariable Long id, @RequestBody AtualizarStatusRequest statusRequest){
 
-        var atualizarUsuario = usuarioService.atualizarStatus(statusRequest.status(),id);
+        var atualizarUsuario = usuarioService.atualizarStatusUsuario(statusRequest.status(),id);
 
         if(atualizarUsuario){
             return ResponseEntity.ok().build();
@@ -105,7 +118,7 @@ public class UsuarioController {
     @DeleteMapping("/{id}/excluir")
     public ResponseEntity<Void> excluir(@PathVariable Long id){
 
-        var atualizarUsuario = usuarioService.atualizarStatus(EnumStatusUsuario.EXCLUIDO,id);
+        var atualizarUsuario = usuarioService.atualizarStatusUsuario(EnumStatusUsuario.EXCLUIDO,id);
 
         if(atualizarUsuario){
             return ResponseEntity.ok().build();
