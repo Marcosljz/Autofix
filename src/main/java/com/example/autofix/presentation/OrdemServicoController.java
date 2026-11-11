@@ -1,8 +1,10 @@
 package com.example.autofix.presentation;
 
 import com.example.autofix.application.DTOs.AtualizarStatusOrdemServicoRequest;
-import com.example.autofix.domain.entities.EnumStatusOrdemServico;
-import com.example.autofix.domain.entities.OrdemServico;
+import com.example.autofix.application.DTOs.OrdemServicoRequest;
+import com.example.autofix.application.DTOs.OrdemServicoResponse;
+import com.example.autofix.application.services.OrdemServicoService;
+import com.example.autofix.application.DTOs.EnumStatusOrdemServico;
 import com.example.autofix.domain.repository.OrdemServicoRepository;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -10,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/ordemservicos")
@@ -19,24 +23,29 @@ public class OrdemServicoController {
     @Autowired
     private OrdemServicoRepository ordemServicoRepository;
 
+    @Autowired
+    private OrdemServicoService ordemServicoService;
+
     @GetMapping
     @Operation(
             summary = "Método de consulta de ordens de serviço",
             description = "Método responsável por consultar todas as ordens de serviço cadastradas no sistema")
-    public ResponseEntity<?> listarTodos() {
+    public ResponseEntity<List<OrdemServicoResponse>> listarTodos() {
 
-        return ResponseEntity.ok(ordemServicoRepository.findAll());
+        return ResponseEntity.ok(ordemServicoService.listarTodasOrdensServicoTable());
     }
     @GetMapping("/{id}")
     @Operation(summary = "Método de consulta uma Ordem de Serviço por ID",
             description = "Método responsável por buscar uma Ordem de Serviço específico através do seu ID.")
-    public ResponseEntity<OrdemServico> buscarPorId(@PathVariable Long id){
+    public ResponseEntity<OrdemServicoResponse> buscarPorId(@PathVariable Long id) {
 
-        OrdemServico ordemServicoBanco = ordemServicoRepository.findById(id).orElse(null);
-        if(ordemServicoBanco!= null ) {
+        OrdemServicoResponse ordemServicoBanco = ordemServicoService.buscarPorId(id);
+
+        if (ordemServicoBanco != null) {
             return ResponseEntity.ok(ordemServicoBanco);
         }
-        return  ResponseEntity.notFound().build();
+
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping
@@ -44,66 +53,85 @@ public class OrdemServicoController {
             summary = "Método de criação de ordem de serviço",
             description = "Método responsável por cadastrar uma nova ordem de serviço no sistema"
     )
-    @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<OrdemServico> criar(@RequestBody OrdemServico ordemServico){
+    public ResponseEntity<?> criar(@RequestBody OrdemServicoRequest ordemServico) {
 
-        var ordemServicoBanco =  ordemServicoRepository.save(ordemServico);
-        return ResponseEntity.ok(ordemServicoBanco);
+        try {
+            OrdemServicoResponse ordemServicoBanco =
+                    ordemServicoService.salvarOrdemServico(ordemServico, 0L);
+
+            return ResponseEntity.status(HttpStatus.CREATED).body(ordemServicoBanco);
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
+
 
     @PatchMapping("/{id}/status")
     @Operation(
             summary = "Método de atualização de status de ordem de serviço",
-            description = "Método responsável por atualizar apenas o status de uma ordem de serviço cadastrada no sistema")
-    public ResponseEntity<Void> atualizarStatus(@PathVariable Long id, @RequestBody AtualizarStatusOrdemServicoRequest statusRequest){
+            description = "Método responsável por atualizar apenas o status de uma ordem de serviço cadastrada no sistema"
+    )
+    public ResponseEntity<?> atualizarStatus(
+            @PathVariable Long id,
+            @RequestBody AtualizarStatusOrdemServicoRequest statusRequest
+    ) {
 
-        OrdemServico ordemServicoBanco = ordemServicoRepository.findById(id).orElse(null);
-        if(ordemServicoBanco!= null ){
-            ordemServicoBanco.setStatusOrdemServico(statusRequest.statusOrdemServico());
-            ordemServicoRepository.save(ordemServicoBanco);
-            return  ResponseEntity.ok().build();
+        try {
+            var atualizarOrdemServico = ordemServicoService.atualizarStatus(
+                    statusRequest.statusOrdemServico(), id
+            );
+
+            if (atualizarOrdemServico) {
+                return ResponseEntity.ok().build();
+            }
+
+            return ResponseEntity.notFound().build();
+
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(e.getMessage());
         }
-
-        return  ResponseEntity.notFound().build();
     }
-
     @PutMapping("/{id}")
     @Operation(
             summary = "Método de atualização de ordem de serviço",
             description = "Método responsável por atualizar todos os dados de uma ordem de serviço cadastrada no sistema")
-    public ResponseEntity<OrdemServico> atualizar(@PathVariable Long id, @RequestBody OrdemServico ordemServico){
+    public ResponseEntity<?> atualizar(
+            @PathVariable Long id,
+            @RequestBody OrdemServicoRequest ordemServico
+    ) {
 
-        try{
-            OrdemServico ordemServicoBanco = ordemServicoRepository.findById(id).orElse(null);
-            if(ordemServicoBanco!= null ){
-                ordemServicoBanco.setDataAbertura(ordemServico.getDataAbertura());
-                ordemServicoBanco.setDataConclusao(ordemServico.getDataConclusao());
-                ordemServicoBanco.setStatusOrdemServico(ordemServico.getStatusOrdemServico());
-                ordemServicoBanco.setDescricao(ordemServico.getDescricao());
-                ordemServicoRepository.save(ordemServicoBanco);
-                return  ResponseEntity.ok().build();
+        try {
+            OrdemServicoResponse ordemServicoBanco =
+                    ordemServicoService.salvarOrdemServico(ordemServico, id);
+
+            if (ordemServicoBanco != null) {
+                return ResponseEntity.ok(ordemServicoBanco);
             }
-            return  ResponseEntity.notFound().build();
-        } catch (RuntimeException e) {
-            throw new RuntimeException(e);
-        }
 
+            return ResponseEntity.notFound().build();
+
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @DeleteMapping("/{id}/excluir")
     @Operation(
             summary = "Método de exclusão de ordem de serviço",
             description = "Método responsável por excluir (cancelar) uma ordem de serviço cadastrada no sistema")
-    public ResponseEntity<Void> excluir(@PathVariable Long id){
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
 
-        OrdemServico ordemServicoBanco = ordemServicoRepository.findById(id).orElse(null);
-        if(ordemServicoBanco!= null ){
-            ordemServicoBanco.setStatusOrdemServico(EnumStatusOrdemServico. EXCLUIDO);
-            ordemServicoRepository.save(ordemServicoBanco);
-            return  ResponseEntity.ok().build();
+        var atualizarOrdemServico = ordemServicoService.atualizarStatus(
+                EnumStatusOrdemServico.EXCLUIDO, id
+        );
+
+        if (atualizarOrdemServico) {
+            return ResponseEntity.ok().build();
         }
 
-        return  ResponseEntity.notFound().build();
+        return ResponseEntity.notFound().build();
     }
 
 }

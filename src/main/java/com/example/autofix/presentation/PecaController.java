@@ -53,20 +53,21 @@ public class PecaController {
         return ResponseEntity.notFound().build();
     }
 
+
     @PostMapping
     @Operation(
             summary = "Método de criação de peça",
             description = "Método responsável por cadastrar uma nova peça no sistema")
-    @ResponseStatus(HttpStatus.CREATED)
     public ResponseEntity<?> criar(@RequestBody PecaRequest peca) {
 
         try {
             PecaResponse pecaBanco = pecaService.salvarPeca(peca, 0L);
-            return ResponseEntity.ok(pecaBanco);
+            return ResponseEntity.status(HttpStatus.CREATED).body(pecaBanco);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
 
 
     @PatchMapping("/{id}/status")

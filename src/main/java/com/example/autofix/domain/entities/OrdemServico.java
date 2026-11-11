@@ -23,6 +23,9 @@ public class OrdemServico {
 
     public LocalDateTime dataConclusao;
 
+
+    private boolean estoqueBaixado = false;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "mecanica_id", referencedColumnName = "id")
     private Mecanica mecanica;
@@ -30,6 +33,10 @@ public class OrdemServico {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_cadastro_id", referencedColumnName = "id")
     private Usuario usuarioCadastro;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "veiculo_id", referencedColumnName = "id")
+    private Veiculo veiculo;
 
     @Enumerated(EnumType.STRING)
     public EnumStatusOrdemServico statusOrdemServico =EnumStatusOrdemServico.ABERTO;
