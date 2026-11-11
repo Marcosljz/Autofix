@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="500.0" prefWidth="600.0"
+            xmlns="http://javafx.com/javafx/17.0.12"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.example.back.CadastroMecanicaController">
+
+    <children>
+
+        <Label layoutX="200.0" layoutY="25.0"
+               text="Cadastro de Mecânica"
+               style="-fx-font-size: 20px; -fx-font-weight: bold;" />
+
+        <Label layoutX="50.0" layoutY="85.0" text="Razão Social:" />
+        <TextField fx:id="txtRazaoSocial" layoutX="180.0" layoutY="80.0" prefWidth="350.0" />
+
+        <Label layoutX="50.0" layoutY="130.0" text="Nome Fantasia:" />
+        <TextField fx:id="txtNomeFantasia" layoutX="180.0" layoutY="125.0" prefWidth="350.0" />
+
+        <Label layoutX="50.0" layoutY="175.0" text="CNPJ:" />
+        <TextField fx:id="txtCnpj"
+                   layoutX="180.0"
+                   layoutY="170.0"
+                   prefWidth="230.0" />
+
+        <Button layoutX="420.0"
+                layoutY="170.0"
+                onAction="#consultarCnpj"
+                text="Consultar CNPJ"
+                prefWidth="130.0" />
+
+        <Separator layoutX="50.0" layoutY="215.0" prefWidth="500.0" />
+
+        <Label layoutX="50.0" layoutY="240.0"
+               text="Dados do Administrador"
+               style="-fx-font-size: 16px; -fx-font-weight: bold;" />
+
+        <Label layoutX="50.0" layoutY="285.0" text="Nome:" />
+        <TextField fx:id="txtNome" layoutX="180.0" layoutY="280.0" prefWidth="350.0" />
+
+        <Label layoutX="50.0" layoutY="330.0" text="Email:" />
+        <TextField fx:id="txtEmail" layoutX="180.0" layoutY="325.0" prefWidth="350.0" />
+
+        <Label layoutX="50.0" layoutY="375.0" text="Senha:" />
+        <PasswordField fx:id="txtSenha" layoutX="180.0" layoutY="370.0" prefWidth="350.0" />
+
+        <Label layoutX="50.0" layoutY="420.0" text="CPF:" />
+        <TextField fx:id="txtCpf" layoutX="180.0" layoutY="415.0" prefWidth="350.0" />
+
+        <Button layoutX="225.0" layoutY="460.0"
+                onAction="#cadastrarMecanica"
+                text="Cadastrar Mecânica"
+                prefWidth="160.0" />
+
+    </children>
+</AnchorPane>
