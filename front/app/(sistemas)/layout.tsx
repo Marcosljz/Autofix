@@ -1,48 +1,34 @@
-'use client'
+"use client";
+
+import { useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useRouter } from "next/navigation";
 import Footer from "../components/Footer";
 import Header from "../components/Header";
 import Sidebar from "../components/Sidebar";
-import { RootState } from "../redux/store";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import type { RootState } from "../redux/store";
 
+export default function SistemaLayout({ children }: { children: React.ReactNode }) {
+  const usuario = useSelector((state: RootState) => state.auth.usuario);
+  const token = useSelector((state: RootState) => state.auth.token);
+  const router = useRouter();
 
-// Layout principal do sistema
-// O children representa o conteúdo da página que está sendo acessada
-export default function SistemaLayout({children}){
+  useEffect(() => {
+    if (!token || !usuario) router.replace("/login");
+  }, [token, usuario, router]);
 
-const usuario= useSelector((state:RootState)=> state.auth.usuario);
-
-const router = useRouter();
-
-useEffect(()=>{
-  if(usuario == null){
-    router.push('/login');
+  if (!token || !usuario) {
+    return <div className="min-h-screen bg-black flex items-center justify-center text-neutral-300">Verificando autenticação...</div>;
   }
-})
 
   return (
     <div className="flex min-h-screen bg-black">
-
-      {/* Menu lateral do sistema */}
-      <Sidebar/>
-
-      <div className="flex-1 flex flex-col">
-
-        {/* Cabeçalho do sistema */}
-        <Header/>
-
-        {/* Aqui é exibido o conteúdo da página atual */}
-        <main className="flex-1 p-6">
-          {children} 
-        </main>
-
-        {/* Rodapé do sistema */}
-        <Footer/>
-
+      <Sidebar />
+      <div className="flex-1 flex flex-col min-w-0">
+        <Header />
+        <main className="flex-1 p-6">{children}</main>
+        <Footer />
       </div>
-    
     </div>
-  )
+  );
 }
