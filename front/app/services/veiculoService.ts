@@ -1,77 +1,33 @@
 import { veiculo } from "../types/veiculo";
 import api from "./api";
 
-export async function buscarListaVeiculos() : Promise<veiculo[]>{
-
-   const dados = await api.get<veiculo[]>( "http://localhost:8080/veiculos");
-
-   
-    if (dados.status= 200 ){
-        return dados.data;
-    }
-
-    
-    return[];
+export async function buscarListaVeiculos(): Promise<veiculo[]> {
+  const resposta = await api.get<veiculo[]>("/veiculos");
+  return resposta.data;
 }
 
-export async function deletarVeiculo(id:number) : Promise<number>{
-
-    var result = api.delete('http://localhost:8080/veiculos/' + id + '/excluir');
-    return (await result).status;
+export async function deletarVeiculo(id: number): Promise<number> {
+  const resposta = await api.delete(`/veiculos/${id}/excluir`);
+  return resposta.status;
 }
 
-export async function atualizarStatusVeiculo(veiculo:veiculo):Promise<void>{
-    var novoStatus = {};
+export async function atualizarStatusVeiculo(dadosVeiculo: veiculo): Promise<void> {
+  const statusVeiculo = dadosVeiculo.statusVeiculo === "ATIVO" ? "INATIVO" : "ATIVO";
 
-        if (veiculo.statusVeiculo === "ATIVO") {
-
-            novoStatus = {
-                statusVeiculo: "INATIVO"
-            };
-
-        } else {
-
-            novoStatus = {
-                statusVeiculo: "ATIVO"
-            };
-
-        }
-
-
-        var dadosRetorno = await api.patch(
-            'http://localhost:8080/veiculos/' + veiculo.id + '/status',
-            novoStatus
-        );
-
-
-        if (dadosRetorno.status == 200) {
-
-            alert("Atualizado status com sucesso!");
-
-        } else {
-
-            alert(dadosRetorno.data);
-            return;
-
-        }
+  await api.patch(`/veiculos/${dadosVeiculo.id}/status`, { statusVeiculo });
 }
 
-export async function consultaVeiculoPorId(id:number):Promise<veiculo>{
-    const valorVeiculoBack = await api.get<veiculo>('http://localhost:8080/veiculos/'+id);
-    return valorVeiculoBack.data;
-
+export async function consultaVeiculoPorId(id: number): Promise<veiculo> {
+  const resposta = await api.get<veiculo>(`/veiculos/${id}`);
+  return resposta.data;
 }
 
-
-export async function  atualizarVeiculo (veiculo:veiculo): Promise<number>{
-    var dadosRetorno = await  
-    api.put<number>('http://localhost:8080/veiculos/'+veiculo.id,veiculo);
-    return dadosRetorno.data;
+export async function atualizarVeiculo(dadosVeiculo: veiculo): Promise<veiculo> {
+  const resposta = await api.put<veiculo>(`/veiculos/${dadosVeiculo.id}`, dadosVeiculo);
+  return resposta.data;
 }
 
-
-export async function  salvarVeiculo (veiculo:veiculo): Promise<number>{
-    var dadosRetorno = await  
-    api.post<number>('http://localhost:8080/veiculos',veiculo);
-    return dadosRetorno.data;
+export async function salvarVeiculo(dadosVeiculo: veiculo): Promise<veiculo> {
+  const resposta = await api.post<veiculo>("/veiculos", dadosVeiculo);
+  return resposta.data;
 }
