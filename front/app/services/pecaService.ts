@@ -1,64 +1,32 @@
 import { Peca } from "../types/peca";
 import api from "./api";
 
-export async function buscarListaPeca() : Promise<Peca[]>{
+type PecaApi = Partial<Peca> & { statusPeca?: string; Marca?: string; Descricao?: string };
 
-   const dados = await api.get<Peca[]>('/peca');
-   
-    if (dados.status== 200 ){
-        return dados.data;
-    }
-
-    return[];
+function normalizarPeca(dado: PecaApi): Peca {
+  return new Peca(dado.id ?? null, dado.nome ?? "", dado.preco ?? "", dado.marca ?? dado.Marca ?? "", dado.descricao ?? dado.Descricao ?? "", dado.quantidade ?? "", dado.statuspeca ?? dado.statusPeca ?? "DISPONIVEL");
 }
 
-export async function deletarPeca(id:number) : Promise<number>{
-
-    var result = api.delete('/pecas/' + id + '/excluir');
-    return (await result).status;
+function corpoPeca(peca: Peca) {
+  return { nome: peca.nome, preco: peca.preco, Marca: peca.marca, quantidade: peca.quantidade, Descricao: peca.descricao };
 }
 
-export async function atualizarStatusPecas(pecas:Peca):Promise<void>{
-    var novoStatus = {};
-
-       
-        var novoStatus = {};
-
-        if (pecas.statuspeca === "DISPONIVEL") {
-            novoStatus = { statusPeca: "ESGOTADO" }
-        } else {
-            novoStatus = { statusPeca: "DISPONIVEL" }
-        }
-
-        var dadosRetorno = await api.patch(
-            '/pecas/' + pecas.id + '/status',
-            novoStatus
-        );
-
-        if (dadosRetorno.status === 200) {
-            alert("Atualizado status com sucesso!");
-        } else {
-            alert(dadosRetorno.data);
-            return;
-        }
+export async function buscarListaPeca(): Promise<Peca[]> {
+  return (await api.get<PecaApi[]>("/pecas")).data.map(normalizarPeca);
 }
-
-export async function consultaPecaPorId(id:number):Promise<Peca>{
-    const valorPecaBack = await api.get<Peca>('/pecas/'+id);
-    return valorPecaBack.data;
-
+export async function deletarPeca(id: number): Promise<number> {
+  return (await api.delete(`/pecas/${id}/excluir`)).status;
 }
-
-
-export async function  atualizarPeca (pecas:Peca): Promise<number>{
-    var dadosRetorno = await  
-    api.put<number>('/pecas/'+pecas.id,pecas);
-    return dadosRetorno.data;
+export async function atualizarStatusPecas(peca: Peca): Promise<void> {
+  const statusPeca = peca.statuspeca === "DISPONIVEL" ? "ESGOTADO" : "DISPONIVEL";
+  await api.patch(`/pecas/${peca.id}/status`, { statusPeca });
 }
-
-
-export async function  salvarPeca (pecas:Peca): Promise<number>{
-    var dadosRetorno = await  
-    api.post<number>('/pecas',pecas);
-    return dadosRetorno.data;
+export async function consultaPecaPorId(id: number): Promise<Peca> {
+  return normalizarPeca((await api.get<PecaApi>(`/pecas/${id}`)).data);
+}
+export async function atualizarPeca(peca: Peca): Promise<Peca> {
+  return normalizarPeca((await api.put<PecaApi>(`/pecas/${peca.id}`, corpoPeca(peca))).data);
+}
+export async function salvarPeca(peca: Peca): Promise<Peca> {
+  return normalizarPeca((await api.post<PecaApi>("/pecas", corpoPeca(peca))).data);
 }

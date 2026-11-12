@@ -1,14 +1,20 @@
-export class OrdemServico{
-    constructor(
-        public id: number | null,
-        public dataAbertura:Date,
-        public dataConclusao:Date,
-        public statusOrdemServico:string,
-        public descricao:string
-    ){}
+export class OrdemServico {
+  constructor(
+    public id: number | null,
+    public dataAbertura: Date | string,
+    public dataConclusao: Date | string | null,
+    public statusOrdemServico: string,
+    public descricao: string,
+    public veiculoId: number | null,
+  ) {}
 }
 
 export interface OrdemServicoFormProps {
-    
-    ordemServicoExistente?: OrdemServico
+  ordemServicoExistente?: OrdemServico;
+}
+
+export interface OrdemServicoPecaRequest {
+  ordemServicoId: number;
+  pecaId: number;
+  quantidade: number;
 }

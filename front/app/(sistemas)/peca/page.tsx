@@ -223,6 +223,7 @@ export default function Pecas() {
 
                                             <button
                                                 type="button"
+                                                disabled={peca.statuspeca === "EXCLUIDO"}
                                                 onClick={() => handleAlterarStatusPeca(peca)}
                                                 className={`group inline-flex items-center gap-1 px-2.5 py-2 text-xs font-semibold
                                                 rounded-xl border transition-all duration-300
