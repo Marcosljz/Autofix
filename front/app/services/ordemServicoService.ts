@@ -12,11 +12,25 @@ export async function deletarOrdemServico(id: number): Promise<number> {
 }
 
 export async function atualizarStatusOrdemServico(ordemServico: OrdemServico): Promise<void> {
-  let statusOrdemServico: string;
-  if (ordemServico.statusOrdemServico === "ABERTO") statusOrdemServico = "ANDAMENTO";
-  else if (ordemServico.statusOrdemServico === "ANDAMENTO") statusOrdemServico = "FECHADO";
-  else statusOrdemServico = "ABERTO";
-  await api.patch(`/ordemservicos/${ordemServico.id}/status`, { statusOrdemServico });
+  let novoStatus: { statusOrdemServico: string } = {};
+
+  if (ordemServico.statusOrdemServico === "ABERTO") {
+    novoStatus = { statusOrdemServico: "ANDAMENTO" };
+  } else if (ordemServico.statusOrdemServico === "ANDAMENTO") {
+    novoStatus = { statusOrdemServico: "FECHADO" };
+  } else if (ordemServico.statusOrdemServico === "FECHADO") {
+    novoStatus = { statusOrdemServico: "ABERTO" };
+  } else if (ordemServico.statusOrdemServico === "EXCLUIDO") {
+    novoStatus = { statusOrdemServico: "ABERTO" };
+  }
+
+  const resposta = await api.patch(`/ordemservicos/${ordemServico.id}/status`, novoStatus);
+
+  if (resposta.status === 200) {
+    alert("Status atualizado com sucesso!");
+  } else {
+    alert(resposta.data);
+  }
 }
 
 export async function consultaOrdemServicoPorId(id: number): Promise<OrdemServico> {
