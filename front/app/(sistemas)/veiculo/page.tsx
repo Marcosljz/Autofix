@@ -235,6 +235,7 @@ export default function Veiculos() {
 
                                             <button
                                                 type="button"
+                                                disabled={veiculo.statusVeiculo === "EXCLUIDO"}
                                                 onClick={() => handleAlterarStatusVeiculo(veiculo)}
                                                 className={`group inline-flex items-center gap-1 px-2.5 py-2 text-xs font-semibold
                                                 rounded-xl border transition-all duration-300
