@@ -78,16 +78,20 @@ export default function OrdemServicoForm({ ordemServicoExistente }: OrdemServico
         ordemSalva = await salvarOrdemServico(ordemServico);
       }
 
-      if (pecaId) {
-        if (!ordemSalva.id) throw new Error("A ordem foi salva, mas não foi possível identificar seu código.");
-        await adicionarPecaNaOrdemServico({
-          ordemServicoId: ordemSalva.id,
-          pecaId: Number(pecaId),
-          quantidade: Number(quantidadePeca),
-        });
+      if (pecaId && ordemSalva.id) {
+        try {
+          await adicionarPecaNaOrdemServico({
+            ordemServicoId: ordemSalva.id,
+            pecaId: Number(pecaId),
+            quantidade: Number(quantidadePeca),
+          });
+          alert("Ordem de serviço salva e peça vinculada com sucesso!");
+        } catch {
+          alert("A ordem de serviço foi salva, mas não foi possível vincular a peça. Você pode tentar adicionar a peça editando a ordem.");
+        }
+      } else {
+        alert(ordemServicoExistente ? "Ordem de serviço atualizada com sucesso!" : "Ordem de serviço cadastrada com sucesso!");
       }
-
-      alert(ordemServicoExistente ? "Ordem de serviço atualizada com sucesso!" : "Ordem de serviço cadastrada com sucesso!");
       router.push("/ordemServico");
     } catch (erro) {
       const mensagem = erro instanceof Error ? erro.message : "Verifique os dados e tente novamente.";
