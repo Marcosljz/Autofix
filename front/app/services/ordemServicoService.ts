@@ -1,91 +1,49 @@
-import { OrdemServico } from "../types/ordemservico";
+import { OrdemServico, OrdemServicoPecaRequest } from "../types/ordemservico";
 import api from "./api";
 
-
-
-export async function buscarListaOrdemServico() : Promise <OrdemServico[]> {
-
-    const dados = await api.get<OrdemServico[]>("http://localhost:8080/ordemservicos");
-
-    if (dados.status== 200 ){
-        return dados.data;
-    }
-
-    
-    return[];
-
-}
-export async function deletarOrdemServico(id:number):Promise<number> {
-
-    var result = api.delete('http://localhost:8080/ordemservicos/' + id + '/excluir');
-    return (await result).status;
+export async function buscarListaOrdemServico(): Promise<OrdemServico[]> {
+  const resposta = await api.get<OrdemServico[]>("/ordemservicos");
+  return resposta.data;
 }
 
-export async function atualizarStatusOrdemServico(ordemservico:OrdemServico) :Promise<void>{
-           let novoStatus = {};
-
-        if (ordemservico.statusOrdemServico === "ABERTO") {
-
-            novoStatus = {
-                statusOrdemServico: "ANDAMENTO"
-            };
-
-        } else if (ordemservico.statusOrdemServico === "ANDAMENTO") {
-
-            novoStatus = {
-                statusOrdemServico: "FECHADO"
-            };
-
-        } else if (ordemservico.statusOrdemServico === "FECHADO") {
-
-            novoStatus = {
-                statusOrdemServico: "ABERTO"
-            };
-
-        } else if (ordemservico.statusOrdemServico === "EXCLUIDO") {
-
-            novoStatus = {
-                statusOrdemServico: "ABERTO"
-            };
-
-        }
-
-
-        const dadosRetorno = await api.patch(
-            "http://localhost:8080/ordemservicos/" +
-            ordemservico.id +
-            "/status",
-            novoStatus
-        );
-
-
-        if (dadosRetorno.status == 200) {
-
-            alert("Status atualizado com sucesso!");
-
-        } else {
-
-            alert(dadosRetorno.data);
-            return;
-
-        }
-    
-    }
-export async function consultaOrdemServicoPorId(id:number):Promise<OrdemServico>{
-    const valorOrdemServicoBack = await api.get<OrdemServico>('http://localhost:8080/ordemservicos/'+id);
-    return valorOrdemServicoBack.data;
-
+export async function deletarOrdemServico(id: number): Promise<number> {
+  const resposta = await api.delete(`/ordemservicos/${id}/excluir`);
+  return resposta.status;
 }
 
-export async function  atualizarOrdemServico (ordemservico:OrdemServico): Promise<number>{
-    var dadosRetorno = await  
-    api.put<number>('http://localhost:8080/ordemservicos/'+ordemservico.id,ordemservico);
-    return dadosRetorno.data;
+export async function atualizarStatusOrdemServico(ordemServico: OrdemServico): Promise<void> {
+  let statusOrdemServico: string;
+  if (ordemServico.statusOrdemServico === "ABERTO") statusOrdemServico = "ANDAMENTO";
+  else if (ordemServico.statusOrdemServico === "ANDAMENTO") statusOrdemServico = "FECHADO";
+  else statusOrdemServico = "ABERTO";
+  await api.patch(`/ordemservicos/${ordemServico.id}/status`, { statusOrdemServico });
 }
 
+export async function consultaOrdemServicoPorId(id: number): Promise<OrdemServico> {
+  const resposta = await api.get<OrdemServico>(`/ordemservicos/${id}`);
+  return resposta.data;
+}
 
-export async function  salvarOrdemServico (ordemservico:OrdemServico): Promise<number>{
-    var dadosRetorno = await  
-    api.post<number>('http://localhost:8080/ordemservicos',ordemservico);
-    return dadosRetorno.data;
+export async function atualizarOrdemServico(ordemServico: OrdemServico): Promise<OrdemServico> {
+  const resposta = await api.put<OrdemServico>(`/ordemservicos/${ordemServico.id}`, {
+    dataAbertura: ordemServico.dataAbertura,
+    dataConclusao: ordemServico.dataConclusao,
+    descricao: ordemServico.descricao,
+    veiculoId: ordemServico.veiculoId,
+  });
+  return resposta.data;
+}
+
+export async function salvarOrdemServico(ordemServico: OrdemServico): Promise<OrdemServico> {
+  const resposta = await api.post<OrdemServico>("/ordemservicos", {
+    dataAbertura: ordemServico.dataAbertura,
+    dataConclusao: ordemServico.dataConclusao,
+    descricao: ordemServico.descricao,
+    veiculoId: ordemServico.veiculoId,
+  });
+  return resposta.data;
+}
+
+export async function adicionarPecaNaOrdemServico(request: OrdemServicoPecaRequest): Promise<void> {
+  await api.post("/ordens-servico-pecas", request);
 }
