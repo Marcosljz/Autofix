@@ -1,10 +1,6 @@
 "use client"
 
-import { link } from "fs";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { type } from "os";
-
 export default function Home() {
 
   const router = useRouter();
@@ -96,6 +92,7 @@ export default function Home() {
            
                 <button
                   type="button"
+                  onClick={handlelogin}
                   className="inline-flex items-center gap-3 px-8 py-4 text-base font-bold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-300 hover:from-amber-300 hover:to-amber-200 rounded-xl transition-all shadow-xl shadow-amber-400/15 transform hover:-translate-y-0.5 active:translate-y-0"
                 >
                   Acessar Plataforma
