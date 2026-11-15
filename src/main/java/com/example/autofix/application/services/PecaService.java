@@ -124,9 +124,9 @@ public class PecaService {
 
                 pecaBanco.setNome(peca.nome());
                 pecaBanco.setPreco(peca.preco());
-                pecaBanco.setMarca(peca.Marca());
+                pecaBanco.setMarca(peca.marca());
                 pecaBanco.setQuantidade(peca.quantidade());
-                pecaBanco.setDescricao(peca.Descricao());
+                pecaBanco.setDescricao(peca.descricao());
 
                 pecaRepository.save(pecaBanco);
 
