@@ -14,6 +14,8 @@ import com.example.autofix.domain.repository.PecaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class OrdemServicoPecaService {
 
@@ -145,5 +147,180 @@ public class OrdemServicoPecaService {
                 peca.getId(),
                 salvo.getQuantidade()
         );
+    }
+
+
+    // Lista as peças vinculadas a uma ordem de serviço
+    public List<PecaOrdemServicoResponse> listarPorOrdemServico(Long ordemServicoId) {
+
+        OrdemServico ordem = ordemServicoRepository
+                .findById(ordemServicoId).orElse(null);
+
+        if (ordem == null) {
+            throw new RuntimeException("Ordem de serviço não encontrada!");
+        }
+
+        if (!contexto.podeAcessar(ordem.getMecanica())) {
+            throw new RuntimeException(
+                    "Sem permissão para visualizar esta ordem!"
+            );
+        }
+
+        if (!contexto.isAdmin() && !contexto.isAdminMecanica()) {
+
+            Long usuarioId = contexto.getUsuarioLogadoId();
+
+            if (ordem.getUsuarioCadastro() == null
+                    || usuarioId == null
+                    || !ordem.getUsuarioCadastro().getId().equals(usuarioId)) {
+
+                throw new RuntimeException(
+                        "Você só pode visualizar as ordens de serviço que cadastrou!"
+                );
+            }
+        }
+
+        return repository.findByOrdemServico_Id(ordemServicoId)
+                .stream()
+                .map(item -> new PecaOrdemServicoResponse(
+                        item.getId(),
+                        ordem.getId(),
+                        item.getPeca().getId(),
+                        item.getQuantidade()
+                ))
+                .toList();
+    }
+
+
+    // Atualiza a quantidade de uma peça vinculada
+    public PecaOrdemServicoResponse atualizar(
+            Long id,
+            OrdemServicoPecaRequest request) {
+
+        OrdemServicoPeca item = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        "Peça vinculada à ordem não encontrada!"
+                ));
+
+        OrdemServico ordem = item.getOrdemServico();
+        Peca peca = item.getPeca();
+
+        validarPermissaoAlteracao(ordem, peca);
+
+        if (!ordem.getId().equals(request.ordemServicoId())
+                || !peca.getId().equals(request.pecaId())) {
+
+            throw new RuntimeException(
+                    "Não é permitido alterar a ordem ou a peça vinculada!"
+            );
+        }
+
+        if (request.quantidade() == null || request.quantidade() <= 0) {
+            throw new RuntimeException("Informe uma quantidade válida!");
+        }
+
+        if (peca.getStatuspeca() != EnumStatusPeca.DISPONIVEL) {
+            throw new RuntimeException(
+                    "Esta peça não está disponível para utilização!"
+            );
+        }
+
+        if (peca.getQuantidade() == null) {
+            throw new RuntimeException("Quantidade de estoque não informada!");
+        }
+
+        Integer estoqueDisponivel;
+
+        try {
+            estoqueDisponivel = Integer.parseInt(peca.getQuantidade());
+        } catch (NumberFormatException e) {
+            throw new RuntimeException("Quantidade de estoque inválida!");
+        }
+
+        // Desconsidera o próprio registro ao calcular o estoque utilizado
+        int quantidadeJaAdicionada = repository
+                .findByOrdemServico_Id(ordem.getId())
+                .stream()
+                .filter(outroItem -> outroItem.getPeca() != null
+                        && outroItem.getPeca().getId().equals(peca.getId())
+                        && !outroItem.getId().equals(id))
+                .mapToInt(OrdemServicoPeca::getQuantidade)
+                .sum();
+
+        if (quantidadeJaAdicionada + request.quantidade() > estoqueDisponivel) {
+            throw new RuntimeException(
+                    "Estoque insuficiente! Disponível: "
+                            + (estoqueDisponivel - quantidadeJaAdicionada)
+            );
+        }
+
+        item.setQuantidade(request.quantidade());
+
+        OrdemServicoPeca atualizado = repository.save(item);
+
+        return new PecaOrdemServicoResponse(
+                atualizado.getId(),
+                ordem.getId(),
+                peca.getId(),
+                atualizado.getQuantidade()
+        );
+    }
+
+
+    // Exclui uma peça vinculada à ordem
+    public void excluir(Long id) {
+
+        OrdemServicoPeca item = repository.findById(id)
+                .orElseThrow(() -> new RuntimeException(
+                        "Peça vinculada à ordem não encontrada!"
+                ));
+
+        validarPermissaoAlteracao(
+                item.getOrdemServico(),
+                item.getPeca()
+        );
+
+        repository.delete(item);
+    }
+
+
+    // Valida as permissões e o status da ordem
+    private void validarPermissaoAlteracao(OrdemServico ordem, Peca peca) {
+
+        if (contexto.isAdmin()) {
+            throw new RuntimeException(
+                    "Seu perfil de administrador permite apenas visualizar os registros."
+            );
+        }
+
+        if (!contexto.podeAcessar(ordem.getMecanica())
+                || !contexto.podeAcessar(peca.getMecanica())) {
+
+            throw new RuntimeException(
+                    "Sem permissão para alterar esta peça!"
+            );
+        }
+
+        if (!contexto.isAdminMecanica()) {
+
+            Long usuarioId = contexto.getUsuarioLogadoId();
+
+            if (ordem.getUsuarioCadastro() == null
+                    || usuarioId == null
+                    || !ordem.getUsuarioCadastro().getId().equals(usuarioId)) {
+
+                throw new RuntimeException(
+                        "Você só pode alterar peças das ordens de serviço que cadastrou!"
+                );
+            }
+        }
+
+        if (ordem.getStatusOrdemServico() == EnumStatusOrdemServico.FECHADO
+                || ordem.isEstoqueBaixado()) {
+
+            throw new RuntimeException(
+                    "Não é possível alterar peças de uma OS finalizada!"
+            );
+        }
     }
 }
