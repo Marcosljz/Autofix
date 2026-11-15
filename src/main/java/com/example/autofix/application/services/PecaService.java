@@ -25,6 +25,9 @@ public class PecaService {
     @Autowired
     private ContextoSegurancaService contexto;
 
+    @Autowired
+    private HistoricoService historicoService;
+
 
     public List<PecaResponse> listarTodasPecasTable() {
 
@@ -112,6 +115,10 @@ public class PecaService {
 
             pecaRepository.save(pecaBanco);
 
+            historicoService.registrar(
+                    "Cadastrou a peça: " + pecaBanco.getNome()
+            );
+
             return new PecaResponse(pecaBanco);
 
         } else {
@@ -129,6 +136,11 @@ public class PecaService {
                 pecaBanco.setDescricao(peca.descricao());
 
                 pecaRepository.save(pecaBanco);
+
+                historicoService.registrar(
+                        "Alterou o status da peça " + pecaBanco.getNome()
+                                + " para " + pecaBanco.statuspeca
+                );
 
                 return new PecaResponse(pecaBanco);
             }
@@ -149,6 +161,11 @@ public class PecaService {
             pecaBanco.setStatuspeca(statusPeca);
 
             pecaRepository.save(pecaBanco);
+
+            historicoService.registrar(
+                    "Alterou o status da peça " + pecaBanco.getNome()
+                            + " para " + statusPeca
+            );
 
             return true;
         }

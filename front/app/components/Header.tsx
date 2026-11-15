@@ -1,7 +1,9 @@
+
 'use client'
 
 // Hook do Next.js usado para navegar entre páginas pelo código
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { store } from "../redux/store";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/slices/authSlice";
@@ -23,6 +25,7 @@ export default function Header() {
 
         // Se confirmar, volta para a página inicial
         if (confirmar) {
+            dispatch(logout());
             router.push("/");
         }
     }
@@ -64,22 +67,30 @@ export default function Header() {
                     </div>
 
                     <span className="text-sm font-semibold text-white">
-                     {usuario?.nome?.toLocaleUpperCase() || 'Usuário não identificado'}
+                        {usuario?.nome?.toLocaleUpperCase() || 'Usuário não identificado'}
                     </span>
 
                 </div>
 
 
-                {/* Botão que chama a função de sair */}
-                <button
-                    onClick={()=>{
-                    dispatch(logout());
-                 }
-                }
-                    className="px-4 py-2 text-sm font-bold text-orange-500 border border-orange-500/30 rounded-lg hover:bg-orange-500 hover:text-black transition-colors active:scale-95"
-                >
-                    Sair
-                </button>
+                {/* Botões de Histórico e Sair */}
+                <div className="flex items-center gap-3">
+
+                    <Link
+                        href="/historico"
+                        className="px-4 py-2 text-sm font-bold text-white border border-neutral-700 rounded-lg hover:bg-neutral-800 transition-colors"
+                    >
+                        Histórico
+                    </Link>
+
+                    <button
+                        onClick={handleSair}
+                        className="px-4 py-2 text-sm font-bold text-orange-500 border border-orange-500/30 rounded-lg hover:bg-orange-500 hover:text-black transition-colors active:scale-95"
+                    >
+                        Sair
+                    </button>
+
+                </div>
 
             </div>
 

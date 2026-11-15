@@ -44,6 +44,9 @@ public class OrdemServicoService {
     @Autowired
     private PecaRepository pecaRepository;
 
+    @Autowired
+    private HistoricoService historicoService;
+
 
     public List<OrdemServicoResponse> listarTodasOrdensServicoTable() {
 
@@ -317,6 +320,10 @@ public class OrdemServicoService {
 
             ordemServicoRepository.save(ordemServicoBanco);
 
+            historicoService.registrar(
+                    "Criou a ordem de serviço: " + ordemServicoBanco.getId()
+            );
+
             return new OrdemServicoResponse(ordemServicoBanco);
 
         } else {
@@ -339,6 +346,10 @@ public class OrdemServicoService {
                 ordemServicoBanco.setVeiculo(veiculo);
 
                 ordemServicoRepository.save(ordemServicoBanco);
+
+                historicoService.registrar(
+                        "Editou a ordem de serviço: " + ordemServicoBanco.getId()
+                );
 
                 return new OrdemServicoResponse(ordemServicoBanco);
             }
@@ -386,6 +397,12 @@ public class OrdemServicoService {
             }
 
             ordemServicoBanco.setStatusOrdemServico(statusOrdemServico);
+
+            historicoService.registrar(
+                    "Alterou o status da ordem de serviço "
+                            + ordemServicoBanco.getId()
+                            + " para " + statusOrdemServico
+            );
 
             ordemServicoRepository.save(ordemServicoBanco);
 

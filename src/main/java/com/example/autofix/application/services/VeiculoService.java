@@ -26,6 +26,9 @@ public class VeiculoService {
     @Autowired
     private ContextoSegurancaService contexto;
 
+    @Autowired
+    private HistoricoService historicoService;
+
     public List<VeiculoResponse> listarTodosVeiculosTable() {
 
         List<Veiculo> veiculos;
@@ -112,6 +115,10 @@ public class VeiculoService {
 
             veiculoRepository.save(veiculoBanco);
 
+            historicoService.registrar(
+                    "Cadastrou o veículo: " + veiculoBanco.getModelo()
+            );
+
             return new VeiculoResponse(veiculoBanco);
 
         } else {
@@ -134,6 +141,10 @@ public class VeiculoService {
 
                 veiculoRepository.save(veiculoBanco);
 
+                historicoService.registrar(
+                        "Editou o veículo: " + veiculoBanco.getModelo()
+                );
+
                 return new VeiculoResponse(veiculoBanco);
             }
         }
@@ -154,6 +165,11 @@ public class VeiculoService {
                                         .equals(contexto.getUsuarioLogadoId())))) {
 
             veiculoBanco.setStatusVeiculo(status);
+
+            historicoService.registrar(
+                    "Alterou o status do veículo " + veiculoBanco.getPlaca()
+                            + " para " + status
+            );
 
             veiculoRepository.save(veiculoBanco);
 

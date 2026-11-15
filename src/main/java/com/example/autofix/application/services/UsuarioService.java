@@ -34,6 +34,9 @@ public class UsuarioService {
     @Autowired
     private ContextoSegurancaService contexto;
 
+    @Autowired
+    private HistoricoService historicoService;
+
 
     public LoginResponse validarUsuarioAutenticadoRetornaToken(LoginRequest loginRequest) {
 
@@ -222,6 +225,10 @@ public class UsuarioService {
 
             usuarioRepository.save(novoUsuario);
 
+            historicoService.registrar(
+                    "Cadastrou o usuário: " + novoUsuario.getNome()
+            );
+
             return new UsuarioResponse(novoUsuario);
         }
 
@@ -274,6 +281,10 @@ public class UsuarioService {
         usuarioBanco.setSenha(usuario.senha());
 
         usuarioRepository.save(usuarioBanco);
+
+        historicoService.registrar(
+                "Editou o usuário: " + usuarioBanco.getNome()
+        );
 
         return new UsuarioResponse(usuarioBanco);
     }
@@ -330,6 +341,11 @@ public class UsuarioService {
         usuarioBanco.setStatus(status);
 
         usuarioRepository.save(usuarioBanco);
+
+        historicoService.registrar(
+                "Alterou o status do usuário " + usuarioBanco.getNome()
+                        + " para " + status
+        );
 
         return true;
     }
