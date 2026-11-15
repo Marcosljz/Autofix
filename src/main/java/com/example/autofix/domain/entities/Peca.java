@@ -42,9 +42,9 @@ public class Peca {
     public Peca(PecaRequest peca) {
         this.setNome(peca.nome());
         this.setPreco(peca.preco());
-        this.setMarca(peca.Marca());
+        this.setMarca(peca.marca());
         this.setQuantidade(peca.quantidade());
-        this.setDescricao(peca.Descricao());
+        this.setDescricao(peca.descricao());
         this.setStatuspeca(EnumStatusPeca.DISPONIVEL);
     }
 }
