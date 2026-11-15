@@ -6,7 +6,7 @@ export class Peca{
         public marca:string,
         public descricao:string,
         public quantidade:string,
-        public statuspeca:string
+        public statusPeca:string
     ){}
 }
 

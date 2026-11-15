@@ -32,7 +32,7 @@ export default function PecaForm({ pecaExistente }: PecaFormProps) {
                 campo === 'marca' ? valor : valorAnterior.marca,
                 campo === 'descricao' ? valor : valorAnterior.descricao,
                 campo === 'quantidade' ? valor : valorAnterior.quantidade,
-                valorAnterior.statuspeca
+                valorAnterior.statusPeca
             )
         );
     }

@@ -64,7 +64,7 @@ export default function Header() {
                     </div>
 
                     <span className="text-sm font-semibold text-white">
-                       {usuario?.nome.toLocaleUpperCase()|| 'Usuário não identificado'}
+                     {usuario?.nome?.toLocaleUpperCase() || 'Usuário não identificado'}
                     </span>
 
                 </div>

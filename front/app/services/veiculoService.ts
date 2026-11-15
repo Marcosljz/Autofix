@@ -3,7 +3,7 @@ import api from "./api";
 
 export async function buscarListaVeiculos() : Promise<veiculo[]>{
 
-   const dados = await api.get<veiculo[]>( "http://localhost:8080/veiculos");
+   const dados = await api.get<veiculo[]>( "/veiculos");
 
    
     if (dados.status= 200 ){
@@ -16,7 +16,7 @@ export async function buscarListaVeiculos() : Promise<veiculo[]>{
 
 export async function deletarVeiculo(id:number) : Promise<number>{
 
-    var result = api.delete('http://localhost:8080/veiculos/' + id + '/excluir');
+    var result = api.delete('/veiculos/' + id + '/excluir');
     return (await result).status;
 }
 
@@ -39,7 +39,7 @@ export async function atualizarStatusVeiculo(veiculo:veiculo):Promise<void>{
 
 
         var dadosRetorno = await api.patch(
-            'http://localhost:8080/veiculos/' + veiculo.id + '/status',
+            '/veiculos/' + veiculo.id + '/status',
             novoStatus
         );
 
@@ -57,7 +57,7 @@ export async function atualizarStatusVeiculo(veiculo:veiculo):Promise<void>{
 }
 
 export async function consultaVeiculoPorId(id:number):Promise<veiculo>{
-    const valorVeiculoBack = await api.get<veiculo>('http://localhost:8080/veiculos/'+id);
+    const valorVeiculoBack = await api.get<veiculo>('/veiculos/'+id);
     return valorVeiculoBack.data;
 
 }
@@ -65,13 +65,13 @@ export async function consultaVeiculoPorId(id:number):Promise<veiculo>{
 
 export async function  atualizarVeiculo (veiculo:veiculo): Promise<number>{
     var dadosRetorno = await  
-    api.put<number>('http://localhost:8080/veiculos/'+veiculo.id,veiculo);
+    api.put<number>('/veiculos/'+veiculo.id,veiculo);
     return dadosRetorno.data;
 }
 
 
 export async function  salvarVeiculo (veiculo:veiculo): Promise<number>{
     var dadosRetorno = await  
-    api.post<number>('http://localhost:8080/veiculos',veiculo);
+    api.post<number>('/veiculos',veiculo);
     return dadosRetorno.data;
 }
