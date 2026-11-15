@@ -127,10 +127,9 @@ public class UsuarioController {
         return  ResponseEntity.notFound().build();
 
     }
-   @GetMapping("/buscarusuariologado")
-    @Operation(summary = "Usuario Logado",description = "Usuario Logado")
-    public ResponseEntity<UsuarioResponse> buscarusuariologado(){
+    @GetMapping("/buscarusuariologado")
+    @Operation(summary = "Usuario Logado", description = "Usuario Logado")
+    public ResponseEntity<UsuarioLogado> buscarusuariologado() {
         return ResponseEntity.ok(usuarioService.BuscarUsuariologado());
-   }
-
+    }
 }
