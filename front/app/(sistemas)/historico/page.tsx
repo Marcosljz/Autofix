@@ -6,6 +6,7 @@ import api from "@/app/services/api";
 import { RootState, AppDispatch } from "@/app/redux/store";
 import { definirHistoricos } from "@/app/redux/slices/historicoSlice";
 import { Historico } from "@/app/types/historico";
+import { buscarListaHistorico } from "@/app/services/historicoService";
 
 export default function HistoricoPage() {
 
@@ -20,26 +21,26 @@ export default function HistoricoPage() {
 
     useEffect(() => {
 
-        const carregarHistorico = async () => {
+       const carregarHistorico = async () => {
 
-            try {
+    try {
 
-                const resposta = await api.get<Historico[]>("/historico");
+        const dados = await buscarListaHistorico();
 
-                dispatch(definirHistoricos(resposta.data));
+        dispatch(definirHistoricos(dados));
 
-            } catch (error) {
+    } catch (error) {
 
-                setErro("Erro ao carregar o histórico.");
+        setErro("Erro ao carregar o histórico.");
 
-            } finally {
+    } finally {
 
-                setCarregando(false);
+        setCarregando(false);
 
-            }
-        };
+    }
+};
 
-        carregarHistorico();
+carregarHistorico();
 
     }, [dispatch]);
 

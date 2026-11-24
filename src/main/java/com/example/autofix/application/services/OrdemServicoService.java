@@ -398,13 +398,14 @@ public class OrdemServicoService {
 
             ordemServicoBanco.setStatusOrdemServico(statusOrdemServico);
 
+
+            ordemServicoRepository.save(ordemServicoBanco);
+
             historicoService.registrar(
                     "Alterou o status da ordem de serviço "
                             + ordemServicoBanco.getId()
                             + " para " + statusOrdemServico
             );
-
-            ordemServicoRepository.save(ordemServicoBanco);
 
             return true;
         }

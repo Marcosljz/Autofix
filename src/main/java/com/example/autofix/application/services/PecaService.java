@@ -138,8 +138,7 @@ public class PecaService {
                 pecaRepository.save(pecaBanco);
 
                 historicoService.registrar(
-                        "Alterou o status da peça " + pecaBanco.getNome()
-                                + " para " + pecaBanco.statuspeca
+                        "Editou a peça: " + pecaBanco.getNome()
                 );
 
                 return new PecaResponse(pecaBanco);

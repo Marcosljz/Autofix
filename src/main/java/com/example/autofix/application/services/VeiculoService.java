@@ -166,12 +166,13 @@ public class VeiculoService {
 
             veiculoBanco.setStatusVeiculo(status);
 
+
+            veiculoRepository.save(veiculoBanco);
+
             historicoService.registrar(
                     "Alterou o status do veículo " + veiculoBanco.getPlaca()
                             + " para " + status
             );
-
-            veiculoRepository.save(veiculoBanco);
 
             return true;
         }
