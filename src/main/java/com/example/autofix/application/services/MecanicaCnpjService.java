@@ -1,9 +1,8 @@
-
 package com.example.autofix.application.services;
 
 import com.example.autofix.application.DTOs.MecanicaCnpjResponse;
 import com.example.autofix.domain.interfaces.IMecanicaExternalRepository;
-import com.example.autofix.infra.dto.CnpjResponse;
+import com.example.autofix.domain.valueobject.DadosMecanicaCnpj;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +14,13 @@ public class MecanicaCnpjService {
 
     public MecanicaCnpjResponse buscarMecanicaPorCnpj(String cnpj) {
 
-        CnpjResponse resposta = mecanicaExternalRepository.buscarMecanicaPorCnpj(cnpj);
+        DadosMecanicaCnpj resposta =
+                mecanicaExternalRepository.buscarMecanicaPorCnpj(cnpj);
 
         return new MecanicaCnpjResponse(
-                resposta.getRazaoSocial(),
-                resposta.getCnpj(),
-                resposta.getNomeFantasia()
+                resposta.razaoSocial(),
+                resposta.cnpj(),
+                resposta.nomeFantasia()
         );
     }
 }

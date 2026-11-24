@@ -5,6 +5,7 @@ import com.example.autofix.domain.interfaces.IMecanicaExternalRepository;
 import com.example.autofix.infra.dto.CnpjResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Component;
+import com.example.autofix.domain.valueobject.DadosMecanicaCnpj;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -21,8 +22,7 @@ public class MecanicaExternalRepository implements IMecanicaExternalRepository {
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @Override
-    public CnpjResponse buscarMecanicaPorCnpj(String cnpj) {
-
+    public DadosMecanicaCnpj buscarMecanicaPorCnpj(String cnpj) {
         var url = "https://brasilapi.com.br/api/cnpj/v1/"
                 + cnpj.replaceAll("[^0-9]", "");
 
@@ -38,18 +38,27 @@ public class MecanicaExternalRepository implements IMecanicaExternalRepository {
             );
 
             if (response.statusCode() == 200) {
-                return objectMapper.readValue(
-                        response.body(),
-                        CnpjResponse.class
+                CnpjResponse resposta = objectMapper.readValue(
+                        response.body(), CnpjResponse.class
+                );
+
+                return new DadosMecanicaCnpj(
+                        resposta.getRazaoSocial(),
+                        resposta.getCnpj(),
+                        resposta.getNomeFantasia()
                 );
             }
 
-            throw new IllegalArgumentException("CNPJ inválido ou não encontrado!");
+            throw new IllegalArgumentException(
+                    "CNPJ inválido ou não encontrado!"
+            );
 
         } catch (IllegalArgumentException e) {
             throw e;
         } catch (Exception e) {
-            throw new RuntimeException("Erro ao consultar a BrasilAPI!", e);
+            throw new RuntimeException(
+                    "Erro ao consultar a BrasilAPI!", e
+            );
         }
     }
 }
