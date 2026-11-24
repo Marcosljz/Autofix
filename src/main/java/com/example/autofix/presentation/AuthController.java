@@ -12,9 +12,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import com.example.autofix.application.DTOs.ErroResponse;
 
 // Marca a classe como controller REST: recebe requisições HTTP e devolve os dados direto como JSON (sem renderizar página HTML)
 @RestController
+@Tag(name = "Autenticação", description = "Controller responsável pela autenticação dos usuários")
 public class AuthController {
 
 
@@ -24,8 +26,10 @@ public class AuthController {
 
     @PostMapping("/login")
 
-    @Tag(description = "Controller de autenticação", name = "Autenticação")
-    @Operation(description = "Metodo de login", summary = "Autenticação de usuários")
+    @Operation(
+            summary = "Autenticação de usuários",
+            description = "Realiza o login do usuário e retorna o token de autenticação"
+    )
 
     public ResponseEntity<?> login(@RequestBody LoginRequest Request) {
 
@@ -35,6 +39,8 @@ public class AuthController {
             return ResponseEntity.ok(resultadoAutenticaoToken);
         }
 
-        return ResponseEntity.badRequest().body("Usuário ou senha Invalido!");
+        return ResponseEntity.badRequest()
+                .body(new ErroResponse("Usuário ou senha inválidos!"));
+
     }
 }
