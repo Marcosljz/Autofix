@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import com.example.autofix.application.DTOs.ErroResponse;
 
 import java.util.List;
 
@@ -34,6 +35,10 @@ public class UsuarioController {
         return ResponseEntity.ok(usuarioService.listarTodosUsuarioTable());
     }
     @PostMapping("/admin")
+    @Operation(
+            summary = "Criar administrador",
+            description = "Realiza o cadastro do primeiro administrador do sistema"
+    )
     public ResponseEntity<CriarAdminResponse> criarAdmin(@RequestBody CriarAdminRequest criarAdminRequest){
 
         try {
@@ -47,6 +52,10 @@ public class UsuarioController {
     }
 
     @PostMapping("/criar-mecanica")
+    @Operation(
+            summary = "Criar mecânica com administrador",
+            description = "Cadastra uma mecânica e seu administrador responsável"
+    )
     public ResponseEntity<?> criarMecanica (
             @RequestBody CriarAdminMecanicaRequest request) {
 
@@ -57,7 +66,8 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.CREATED).body(resposta);
 
         } catch (RuntimeException e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest()
+                    .body(new ErroResponse(e.getMessage()));
         }
     }
 
@@ -83,8 +93,9 @@ public class UsuarioController {
         try {
             UsuarioResponse usuarioBanco = usuarioService.salvarUsuario(usuario, 0L);
             return ResponseEntity.status(HttpStatus.CREATED).body(usuarioBanco);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ErroResponse(e.getMessage()));
         }
 
     }
@@ -104,18 +115,27 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
+    @Operation(
+            summary = "Atualizar status do usuário",
+            description = "Altera o status de um usuário pelo seu ID"
+    )
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody UsuarioRequest usuario){
 
         try {
             UsuarioResponse usuarioBanco = usuarioService.salvarUsuario(usuario,id);
             return ResponseEntity.ok(usuarioBanco);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.badRequest()
+                    .body(new ErroResponse(e.getMessage()));
         }
 
     }
 
     @DeleteMapping("/{id}/excluir")
+    @Operation(
+            summary = "Excluir usuário",
+            description = "Altera o status do usuário para excluído"
+    )
     public ResponseEntity<Void> excluir(@PathVariable Long id){
 
         var atualizarUsuario = usuarioService.atualizarStatusUsuario(EnumStatusUsuario.EXCLUIDO,id);
